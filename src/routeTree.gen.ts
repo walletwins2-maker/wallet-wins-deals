@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealsRoute = DealsRouteImport.update({
   id: '/deals',
   path: '/deals',
@@ -44,6 +50,7 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/deals': typeof DealsRoute
+  '/search': typeof SearchRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$id': typeof DealIdRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/deals': typeof DealsRoute
+  '/search': typeof SearchRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$id': typeof DealIdRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/deals': typeof DealsRoute
+  '/search': typeof SearchRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$id': typeof DealIdRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -68,15 +77,23 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/deals'
+    | '/search'
     | '/category/$slug'
     | '/deal/$id'
     | '/retailer/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/deals' | '/category/$slug' | '/deal/$id' | '/retailer/$slug'
+  to:
+    | '/'
+    | '/deals'
+    | '/search'
+    | '/category/$slug'
+    | '/deal/$id'
+    | '/retailer/$slug'
   id:
     | '__root__'
     | '/'
     | '/deals'
+    | '/search'
     | '/category/$slug'
     | '/deal/$id'
     | '/retailer/$slug'
@@ -85,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DealsRoute: typeof DealsRoute
+  SearchRoute: typeof SearchRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealIdRoute: typeof DealIdRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
@@ -92,6 +110,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deals': {
       id: '/deals'
       path: '/deals'
@@ -133,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DealsRoute: DealsRoute,
+  SearchRoute: SearchRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealIdRoute: DealIdRoute,
   RetailerSlugRoute: RetailerSlugRoute,
