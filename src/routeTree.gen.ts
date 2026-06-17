@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 
 const DealsRoute = DealsRouteImport.update({
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RetailerSlugRoute = RetailerSlugRouteImport.update({
+  id: '/retailer/$slug',
+  path: '/retailer/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealIdRoute = DealIdRouteImport.update({
   id: '/deal/$id',
   path: '/deal/$id',
@@ -33,30 +39,34 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/deals': typeof DealsRoute
   '/deal/$id': typeof DealIdRoute
+  '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/deals': typeof DealsRoute
   '/deal/$id': typeof DealIdRoute
+  '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/deals': typeof DealsRoute
   '/deal/$id': typeof DealIdRoute
+  '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/deals' | '/deal/$id'
+  fullPaths: '/' | '/deals' | '/deal/$id' | '/retailer/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/deals' | '/deal/$id'
-  id: '__root__' | '/' | '/deals' | '/deal/$id'
+  to: '/' | '/deals' | '/deal/$id' | '/retailer/$slug'
+  id: '__root__' | '/' | '/deals' | '/deal/$id' | '/retailer/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DealsRoute: typeof DealsRoute
   DealIdRoute: typeof DealIdRoute
+  RetailerSlugRoute: typeof RetailerSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/retailer/$slug': {
+      id: '/retailer/$slug'
+      path: '/retailer/$slug'
+      fullPath: '/retailer/$slug'
+      preLoaderRoute: typeof RetailerSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deal/$id': {
       id: '/deal/$id'
       path: '/deal/$id'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DealsRoute: DealsRoute,
   DealIdRoute: DealIdRoute,
+  RetailerSlugRoute: RetailerSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
