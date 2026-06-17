@@ -5,26 +5,32 @@ export interface Deal {
   product_name: string;
   image_url: string;
   product_url: string;
+  product_fingerprint: string;
   price: number;
   original_price: number;
-  discount: number; // percent
-  retailer: string;
-  deal_score: number; // 0-100
-  category: string;
-  created_at: string; // ISO
+  discount: number;
+  retailer: string; // slug
+  retailer_name: string; // display
+  deal_score: number;
+  category: string; // slug
+  created_at: string;
   status: DealStatus;
 }
 
-export const RETAILERS = [
-  { slug: "amazon", name: "Amazon", color: "#FF9900" },
-  { slug: "walmart", name: "Walmart", color: "#0071CE" },
-  { slug: "target", name: "Target", color: "#CC0000" },
-  { slug: "best-buy", name: "Best Buy", color: "#0046BE" },
-  { slug: "nike", name: "Nike", color: "#111111" },
-  { slug: "dyson", name: "Dyson", color: "#222222" },
-  { slug: "macys", name: "Macy's", color: "#E21A2C" },
-  { slug: "home-depot", name: "Home Depot", color: "#F96302" },
-];
+export interface RawDeal {
+  id: number | string;
+  product_name: string | null;
+  image_url: string | null;
+  product_url: string | null;
+  product_fingerprint: string | null;
+  price: number | string | null;
+  original_price: number | string | null;
+  discount: number | string | null;
+  retailer: string | null;
+  deal_score: number | string | null;
+  status: string | null;
+  created_at: string | null;
+}
 
 export const CATEGORIES = [
   { slug: "electronics", name: "Electronics", emoji: "📱" },
@@ -35,130 +41,205 @@ export const CATEGORIES = [
   { slug: "outdoor", name: "Outdoor", emoji: "🏕️" },
   { slug: "toys", name: "Toys", emoji: "🧸" },
   { slug: "fitness", name: "Fitness", emoji: "💪" },
+  { slug: "other", name: "Other", emoji: "🛍️" },
+] as const;
+
+const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
+  ["electronics", ["phone", "laptop", "tablet", "tv", "headphone", "earbud", "camera", "computer", "monitor", "speaker", "console", "watch", "airpod", "ipad", "iphone", "macbook", "kindle", "router"]],
+  ["kitchen", ["kitchen", "blender", "mixer", "fryer", "oven", "cookware", "pan", "pot", "knife", "coffee", "espresso", "toaster", "instant pot", "vitamix", "ninja"]],
+  ["beauty", ["serum", "shampoo", "lotion", "makeup", "skincare", "cream", "perfume", "cosmetic", "lipstick", "mascara", "fragrance"]],
+  ["fashion", ["shirt", "pants", "jeans", "dress", "shoe", "sneaker", "jacket", "hoodie", "sock", "boot", "sandals", "watch band", "handbag", "wallet", "sunglasses", "hat"]],
+  ["outdoor", ["tent", "camping", "hiking", "backpack", "tumbler", "cooler", "grill", "yeti", "stanley", "fishing"]],
+  ["toys", ["lego", "toy", "doll", "puzzle", "game", "playset", "plush", "nerf", "hot wheel"]],
+  ["fitness", ["dumbbell", "yoga", "treadmill", "bike", "fitness", "massage", "peloton", "resistance"]],
+  ["home", ["vacuum", "robot", "mattress", "bedding", "rug", "lamp", "furniture", "sofa", "chair", "decor", "drill", "tool", "dewalt", "broom"]],
 ];
 
-export const retailerBySlug = (slug: string) =>
-  RETAILERS.find((r) => r.slug === slug);
+export function deriveCategory(name: string): string {
+  const n = name.toLowerCase();
+  for (const [slug, words] of CATEGORY_KEYWORDS) {
+    if (words.some((w) => n.includes(w))) return slug;
+  }
+  return "other";
+}
+
 export const categoryBySlug = (slug: string) =>
   CATEGORIES.find((c) => c.slug === slug);
+
 export const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-const img = (q: string, seed: number) =>
-  `https://images.unsplash.com/photo-${q}?auto=format&fit=crop&w=900&q=80&sig=${seed}`;
+const RETAILER_COLORS: Record<string, string> = {
+  amazon: "#FF9900",
+  walmart: "#0071CE",
+  target: "#CC0000",
+  "best-buy": "#0046BE",
+  nike: "#111111",
+  dyson: "#222222",
+  macys: "#E21A2C",
+  "home-depot": "#F96302",
+};
+const FALLBACK_PALETTE = ["#22c55e", "#0ea5e9", "#a855f7", "#f59e0b", "#ef4444", "#14b8a6", "#6366f1", "#ec4899"];
 
-function makeDeal(
-  id: string,
-  product_name: string,
-  image_url: string,
-  retailer: string,
-  category: string,
-  original_price: number,
-  price: number,
-  deal_score: number,
-  daysAgo = 0,
-): Deal {
-  const discount = Math.round(((original_price - price) / original_price) * 100);
+function hashColor(slug: string) {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+  return FALLBACK_PALETTE[h % FALLBACK_PALETTE.length];
+}
+
+function prettyName(slug: string) {
+  return slug
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+export interface RetailerInfo {
+  slug: string;
+  name: string;
+  color: string;
+}
+
+export function retailerInfo(raw: string): RetailerInfo {
+  const slug = slugify(raw);
   return {
-    id,
-    product_name,
-    image_url,
-    product_url: `https://example.com/aff/${id}`,
-    price,
-    original_price,
-    discount,
-    retailer,
-    deal_score,
-    category,
-    created_at: new Date(Date.now() - daysAgo * 86400000).toISOString(),
-    status: "queued",
+    slug,
+    name: prettyName(slug),
+    color: RETAILER_COLORS[slug] ?? hashColor(slug),
   };
 }
 
-export const DEALS: Deal[] = [
-  makeDeal("d1", "Apple AirPods Pro (2nd Gen) USB-C", img("1606220588913-b3aacb4d2f46", 1), "amazon", "electronics", 249, 169, 96, 0),
-  makeDeal("d2", "Dyson V11 Cordless Vacuum", img("1581578731548-c64695cc6952", 2), "dyson", "home", 599, 399, 92, 1),
-  makeDeal("d3", "Nike Pegasus 41 Running Shoes", img("1542291026-7eec264c27ff", 3), "nike", "fashion", 140, 89, 88, 0),
-  makeDeal("d4", "Sony WH-1000XM5 Headphones", img("1583394838336-acd977736f90", 4), "best-buy", "electronics", 399, 279, 94, 0),
-  makeDeal("d5", "Instant Pot Duo 7-in-1 6Qt", img("1585515320310-259814833e62", 5), "walmart", "kitchen", 119, 59, 85, 2),
-  makeDeal("d6", "Ninja Air Fryer Max XL", img("1626808642875-0aa545482dfb", 6), "target", "kitchen", 169, 99, 82, 1),
-  makeDeal("d7", "Patagonia Nano Puff Jacket", img("1551028719-00167b16eac5", 7), "macys", "outdoor", 229, 149, 78, 3),
-  makeDeal("d8", "DeWalt 20V Cordless Drill Kit", img("1581244277943-fe4a9c777189", 8), "home-depot", "home", 199, 119, 86, 0),
-  makeDeal("d9", "iPad Air 11\" M2 128GB", img("1561154464-82e9adf32764", 9), "amazon", "electronics", 599, 499, 90, 0),
-  makeDeal("d10", "LEGO Star Wars Millennium Falcon", img("1587654780291-39c9404d746b", 10), "walmart", "toys", 169, 109, 80, 2),
-  makeDeal("d11", "Bombas Merino Wool Socks 4-Pack", img("1586350977771-2a1dad1c4eea", 11), "macys", "fashion", 80, 48, 70, 4),
-  makeDeal("d12", "Theragun Mini Massage Device", img("1571019613454-1cb2f99b2d8b", 12), "best-buy", "fitness", 199, 129, 84, 1),
-  makeDeal("d13", "Yeti Rambler 30oz Tumbler", img("1605000797499-95a51c5269ae", 13), "amazon", "outdoor", 38, 27, 65, 0),
-  makeDeal("d14", "Vitamix 5200 Blender", img("1570222094114-d054a817e56b", 14), "target", "kitchen", 549, 379, 88, 5),
-  makeDeal("d15", "Olaplex No.3 Hair Perfector", img("1556228720-195a672e8a03", 15), "amazon", "beauty", 30, 18, 72, 0),
-  makeDeal("d16", "Adidas Ultraboost 22", img("1542291026-7eec264c27ff", 16), "nike", "fashion", 190, 119, 79, 2),
-  makeDeal("d17", "Samsung 65\" QLED 4K TV", img("1593359677879-a4bb92f829d1", 17), "best-buy", "electronics", 1299, 799, 95, 1),
-  makeDeal("d18", "KitchenAid Stand Mixer", img("1556909114-f6e7ad7d3136", 18), "target", "kitchen", 449, 279, 90, 0),
-  makeDeal("d19", "Coleman 6-Person Tent", img("1504280390367-361c6d9f38f4", 19), "amazon", "outdoor", 199, 129, 76, 3),
-  makeDeal("d20", "Bose QuietComfort Earbuds II", img("1606220838315-056192d5e927", 20), "best-buy", "electronics", 299, 199, 87, 0),
-  makeDeal("d21", "Peloton Dumbbells 5lb Pair", img("1571019614242-c5c5dee9f50b", 21), "amazon", "fitness", 95, 59, 68, 4),
-  makeDeal("d22", "Roomba j7+ Robot Vacuum", img("1581578731548-c64695cc6952", 22), "amazon", "home", 799, 499, 91, 1),
-  makeDeal("d23", "Lululemon Align Leggings", img("1551803091-e20673f15770", 23), "macys", "fashion", 98, 69, 71, 2),
-  makeDeal("d24", "Drunk Elephant Vitamin C Serum", img("1556228720-195a672e8a03", 24), "macys", "beauty", 80, 52, 74, 0),
-  makeDeal("d25", "Hot Wheels 50-Car Pack", img("1558877385-8c1d9a4f4f6f", 25), "walmart", "toys", 55, 32, 66, 5),
-  makeDeal("d26", "Weber Genesis Gas Grill", img("1555939594-58d7cb561ad1", 26), "home-depot", "outdoor", 999, 699, 89, 1),
-  makeDeal("d27", "Apple Watch Series 10 GPS", img("1546868871-7041f2a55e12", 27), "amazon", "electronics", 399, 329, 83, 0),
-  makeDeal("d28", "Stanley Quencher 40oz Tumbler", img("1605000797499-95a51c5269ae", 28), "target", "outdoor", 45, 29, 73, 2),
-  makeDeal("d29", "Crocs Classic Clog", img("1542291026-7eec264c27ff", 29), "amazon", "fashion", 50, 32, 64, 3),
-  makeDeal("d30", "GoPro HERO12 Black", img("1502920917128-1aa500764cbd", 30), "best-buy", "electronics", 399, 299, 86, 1),
-];
-
-export const activeDeals = () =>
-  DEALS.filter((d) => d.status === "pending" || d.status === "queued");
-
-export function dealById(id: string) {
-  return DEALS.find((d) => d.id === id);
+export function retailerBySlug(slug: string, deals?: Deal[]): RetailerInfo | undefined {
+  if (deals) {
+    const hit = deals.find((d) => d.retailer === slug);
+    if (hit) return { slug, name: hit.retailer_name, color: RETAILER_COLORS[slug] ?? hashColor(slug) };
+  }
+  if (RETAILER_COLORS[slug]) {
+    return { slug, name: prettyName(slug), color: RETAILER_COLORS[slug] };
+  }
+  return undefined;
 }
 
-export function dealsByRetailer(slug: string) {
-  return activeDeals().filter((d) => d.retailer === slug);
+function asNumber(v: unknown, fallback = 0): number {
+  const n = typeof v === "number" ? v : v == null ? NaN : Number(v);
+  return Number.isFinite(n) ? n : fallback;
 }
 
-export function dealsByCategory(slug: string) {
-  return activeDeals().filter((d) => d.category === slug);
+function asStatus(s: string | null): DealStatus {
+  if (s === "pending" || s === "queued" || s === "posted" || s === "expired") return s;
+  return "queued";
 }
 
-export function topDeals(limit = 8) {
-  return [...activeDeals()].sort((a, b) => b.deal_score - a.deal_score).slice(0, limit);
+const PLACEHOLDER_IMG =
+  "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=900&q=80";
+
+export function mapRawDeals(rows: RawDeal[]): Deal[] {
+  return rows
+    .filter((r) => r.product_name && r.product_url)
+    .map((r): Deal => {
+      const price = asNumber(r.price);
+      const original = asNumber(r.original_price, price);
+      const computedDiscount =
+        original > 0 && original > price ? Math.round(((original - price) / original) * 100) : 0;
+      const discount = Math.max(asNumber(r.discount), computedDiscount);
+      const retailerRaw = r.retailer ?? "unknown";
+      const info = retailerInfo(retailerRaw);
+      const name = r.product_name ?? "Untitled deal";
+      return {
+        id: String(r.id),
+        product_name: name,
+        image_url: r.image_url ?? PLACEHOLDER_IMG,
+        product_url: r.product_url ?? "#",
+        product_fingerprint: r.product_fingerprint ?? String(r.id),
+        price,
+        original_price: original,
+        discount,
+        retailer: info.slug,
+        retailer_name: info.name,
+        deal_score: Math.round(asNumber(r.deal_score)),
+        category: deriveCategory(name),
+        created_at: r.created_at ?? new Date().toISOString(),
+        status: asStatus(r.status),
+      };
+    });
 }
 
-export function recentDrops(limit = 8) {
-  return [...activeDeals()]
-    .sort((a, b) => b.discount - a.discount || +new Date(b.created_at) - +new Date(a.created_at))
+/* ---------- helpers operating on a deals array ---------- */
+
+export const activeDeals = (deals: Deal[]) =>
+  deals.filter((d) => d.status !== "expired");
+
+export function dealById(deals: Deal[], id: string) {
+  return deals.find((d) => d.id === id);
+}
+
+export function dealsByRetailer(deals: Deal[], slug: string) {
+  return activeDeals(deals).filter((d) => d.retailer === slug);
+}
+
+export function dealsByCategory(deals: Deal[], slug: string) {
+  return activeDeals(deals).filter((d) => d.category === slug);
+}
+
+export function topDeals(deals: Deal[], limit = 8) {
+  return [...activeDeals(deals)]
+    .sort((a, b) => b.deal_score - a.deal_score || b.discount - a.discount)
     .slice(0, limit);
 }
 
-export function relatedDeals(deal: Deal, limit = 4) {
-  return activeDeals()
+export function recentDrops(deals: Deal[], limit = 8) {
+  return [...activeDeals(deals)]
+    .sort(
+      (a, b) =>
+        b.discount - a.discount ||
+        +new Date(b.created_at) - +new Date(a.created_at),
+    )
+    .slice(0, limit);
+}
+
+export function relatedDeals(deals: Deal[], deal: Deal, limit = 4) {
+  return activeDeals(deals)
     .filter((d) => d.id !== deal.id && d.category === deal.category)
     .slice(0, limit);
 }
 
-export function moreFromRetailer(deal: Deal, limit = 4) {
-  return activeDeals()
+export function moreFromRetailer(deals: Deal[], deal: Deal, limit = 4) {
+  return activeDeals(deals)
     .filter((d) => d.id !== deal.id && d.retailer === deal.retailer)
     .slice(0, limit);
 }
 
-export function searchDeals(q: string) {
+export function searchDeals(deals: Deal[], q: string) {
   const term = q.trim().toLowerCase();
   if (!term) return [];
-  return activeDeals().filter((d) => {
-    const ret = retailerBySlug(d.retailer)?.name.toLowerCase() ?? "";
+  return activeDeals(deals).filter((d) => {
     const cat = categoryBySlug(d.category)?.name.toLowerCase() ?? "";
     return (
       d.product_name.toLowerCase().includes(term) ||
-      ret.includes(term) ||
+      d.retailer_name.toLowerCase().includes(term) ||
       cat.includes(term)
     );
   });
 }
 
+export function topRetailers(deals: Deal[], limit = 8): Array<RetailerInfo & { count: number }> {
+  const map = new Map<string, { info: RetailerInfo; count: number }>();
+  for (const d of activeDeals(deals)) {
+    const cur = map.get(d.retailer);
+    if (cur) cur.count++;
+    else map.set(d.retailer, { info: { slug: d.retailer, name: d.retailer_name, color: RETAILER_COLORS[d.retailer] ?? hashColor(d.retailer) }, count: 1 });
+  }
+  return [...map.values()]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit)
+    .map(({ info, count }) => ({ ...info, count }));
+}
+
 export function formatPrice(n: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 }
+
+// Legacy export for code that wants a static list (kept for Footer fallback)
+export const RETAILERS: RetailerInfo[] = Object.entries(RETAILER_COLORS).map(
+  ([slug, color]) => ({ slug, name: prettyName(slug), color }),
+);
