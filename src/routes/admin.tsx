@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Activity, Package, Store, Tag } from "lucide-react";
 import {
   CATEGORIES,
-  RETAILERS,
   activeDeals,
   categoryBySlug,
   formatPrice,
-  retailerBySlug,
+  topRetailers,
 } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 export const Route = createFileRoute("/admin")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
       { title: "Dashboard — Wallet Wins" },
@@ -17,19 +19,23 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   component: AdminPage,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Couldn't load dashboard</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
 });
 
 function AdminPage() {
-  const deals = activeDeals();
+  const { data: allDeals } = useSuspenseQuery(dealsQueryOptions);
+  const deals = activeDeals(allDeals);
   const today = deals.filter((d) => {
     const diff = Date.now() - +new Date(d.created_at);
     return diff < 24 * 60 * 60 * 1000;
   });
 
-  const byRetailer = RETAILERS.map((r) => ({
-    ...r,
-    count: deals.filter((d) => d.retailer === r.slug).length,
-  })).sort((a, b) => b.count - a.count);
+  const byRetailer = topRetailers(deals, 50);
 
   const byCategory = CATEGORIES.map((c) => ({
     ...c,
@@ -113,7 +119,7 @@ function AdminPage() {
             {recentClicks.map((c, i) => (
               <li key={i} className="flex items-center justify-between py-2">
                 <span className="font-mono text-xs text-muted-foreground">{c.product_fingerprint}</span>
-                <span className="font-semibold">{retailerBySlug(c.retailer)?.name ?? c.retailer}</span>
+                <span className="font-semibold">{c.retailer}</span>
                 <span className="text-xs text-muted-foreground">
                   {new Date(c.clicked_at).toLocaleTimeString()}
                 </span>
