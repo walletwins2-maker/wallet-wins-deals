@@ -2,14 +2,16 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { DealGrid } from "@/components/DealCard";
 import { categoryBySlug, dealsByCategory } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 type Sort = "best" | "newest" | "discount" | "price";
 
 export const Route = createFileRoute("/category/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const category = categoryBySlug(params.slug);
     if (!category) throw notFound();
-    return { category, deals: dealsByCategory(params.slug) };
+    const allDeals = await context.queryClient.ensureQueryData(dealsQueryOptions);
+    return { category, deals: dealsByCategory(allDeals, params.slug) };
   },
   head: ({ loaderData, params }) => {
     const name = loaderData?.category?.name ?? params.slug;
@@ -24,6 +26,17 @@ export const Route = createFileRoute("/category/$slug")({
     };
   },
   component: CategoryPage,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Couldn't load category</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Category not found</h1>
+    </div>
+  ),
 });
 
 function CategoryPage() {

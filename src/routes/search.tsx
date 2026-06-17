@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { DealGrid } from "@/components/DealCard";
 import { searchDeals } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 const schema = z.object({ q: z.string().optional().default("") });
 
 export const Route = createFileRoute("/search")({
   validateSearch: (s) => schema.parse(s),
+  loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
       { title: "Search Deals — Wallet Wins" },
@@ -14,11 +17,17 @@ export const Route = createFileRoute("/search")({
     ],
   }),
   component: SearchPage,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <p className="text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
 });
 
 function SearchPage() {
   const { q } = Route.useSearch();
-  const results = q ? searchDeals(q) : [];
+  const { data: deals } = useSuspenseQuery(dealsQueryOptions);
+  const results = q ? searchDeals(deals, q) : [];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">

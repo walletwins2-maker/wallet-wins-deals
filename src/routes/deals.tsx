@@ -1,18 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { DealGrid } from "@/components/DealCard";
 import {
   CATEGORIES,
-  RETAILERS,
   activeDeals,
-  categoryBySlug,
-  retailerBySlug,
+  topRetailers,
 } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 type Sort = "best" | "newest" | "discount" | "price";
 
 export const Route = createFileRoute("/deals")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
       { title: "All Deals — Wallet Wins" },
@@ -23,9 +24,17 @@ export const Route = createFileRoute("/deals")({
     links: [{ rel: "canonical", href: "/deals" }],
   }),
   component: DealsPage,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Couldn't load deals</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
 });
 
 function DealsPage() {
+  const { data: deals } = useSuspenseQuery(dealsQueryOptions);
+  const RETAILERS = useMemo(() => topRetailers(deals, 20), [deals]);
   const [q, setQ] = useState("");
   const [retailer, setRetailer] = useState("all");
   const [category, setCategory] = useState("all");
@@ -34,7 +43,7 @@ function DealsPage() {
   const [sort, setSort] = useState<Sort>("best");
 
   const filtered = useMemo(() => {
-    let list = activeDeals();
+    let list = activeDeals(deals);
     if (q) {
       const t = q.toLowerCase();
       list = list.filter((d) => d.product_name.toLowerCase().includes(t));
@@ -56,7 +65,7 @@ function DealsPage() {
         list.sort((a, b) => b.deal_score - a.deal_score);
     }
     return list;
-  }, [q, retailer, category, maxPrice, minDiscount, sort]);
+  }, [deals, q, retailer, category, maxPrice, minDiscount, sort]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -150,7 +159,3 @@ function DealsPage() {
 function sortLabel(s: Sort) {
   return s === "best" ? "best deals" : s === "newest" ? "newest" : s === "discount" ? "biggest discount" : "lowest price";
 }
-
-// Tiny helper to also satisfy unused vars
-void retailerBySlug;
-void categoryBySlug;

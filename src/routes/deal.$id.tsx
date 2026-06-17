@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Tag, Store } from "lucide-react";
 import { DealGrid } from "@/components/DealCard";
 import { GetDealButton } from "@/components/GetDealButton";
@@ -10,10 +11,12 @@ import {
   relatedDeals,
   retailerBySlug,
 } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 export const Route = createFileRoute("/deal/$id")({
-  loader: ({ params }) => {
-    const deal = dealById(params.id);
+  loader: async ({ params, context }) => {
+    const deals = await context.queryClient.ensureQueryData(dealsQueryOptions);
+    const deal = dealById(deals, params.id);
     if (!deal) throw notFound();
     return { deal };
   },
@@ -21,7 +24,7 @@ export const Route = createFileRoute("/deal/$id")({
     const deal = loaderData?.deal;
     if (!deal) return { meta: [{ title: "Deal — Wallet Wins" }] };
     const title = `${deal.product_name} — ${deal.discount}% off | Wallet Wins`;
-    const desc = `Save ${formatPrice(deal.original_price - deal.price)} on ${deal.product_name} from ${retailerBySlug(deal.retailer)?.name ?? deal.retailer}. Now ${formatPrice(deal.price)}.`;
+    const desc = `Save ${formatPrice(deal.original_price - deal.price)} on ${deal.product_name} from ${deal.retailer_name}. Now ${formatPrice(deal.price)}.`;
     return {
       meta: [
         { title },
@@ -48,7 +51,7 @@ export const Route = createFileRoute("/deal/$id")({
               priceCurrency: "USD",
               price: deal.price,
               availability: "https://schema.org/InStock",
-              seller: { "@type": "Organization", name: retailerBySlug(deal.retailer)?.name ?? deal.retailer },
+              seller: { "@type": "Organization", name: deal.retailer_name },
             },
           }),
         },
@@ -56,14 +59,31 @@ export const Route = createFileRoute("/deal/$id")({
     };
   },
   component: DealDetail,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Couldn't load this deal</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Deal not found</h1>
+      <Link to="/deals" className="mt-3 inline-block text-primary underline">Browse all deals</Link>
+    </div>
+  ),
 });
 
 function DealDetail() {
   const { deal } = Route.useLoaderData();
-  const retailer = retailerBySlug(deal.retailer);
+  const { data: deals } = useSuspenseQuery(dealsQueryOptions);
+  const retailer = retailerBySlug(deal.retailer, deals) ?? {
+    slug: deal.retailer,
+    name: deal.retailer_name,
+    color: "#22c55e",
+  };
   const category = categoryBySlug(deal.category);
-  const related = relatedDeals(deal);
-  const more = moreFromRetailer(deal);
+  const related = relatedDeals(deals, deal);
+  const more = moreFromRetailer(deals, deal);
   const savings = deal.original_price - deal.price;
 
   return (

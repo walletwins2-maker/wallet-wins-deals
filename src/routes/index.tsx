@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 import { DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
-import { CATEGORIES, RETAILERS, recentDrops, topDeals } from "@/lib/deals-data";
+import { CATEGORIES, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
       { title: "Wallet Wins — The Best Deals. Updated Daily." },
@@ -16,11 +19,19 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "/" }],
   }),
   component: Index,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Couldn't load deals</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
 });
 
 function Index() {
-  const featured = topDeals(8);
-  const drops = recentDrops(8);
+  const { data: deals } = useSuspenseQuery(dealsQueryOptions);
+  const featured = topDeals(deals, 8);
+  const drops = recentDrops(deals, 8);
+  const retailers = topRetailers(deals, 8);
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
@@ -62,7 +73,7 @@ function Index() {
       {/* Retailers */}
       <SectionHeader title="Trending Retailers" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-        {RETAILERS.map((r) => (
+        {retailers.map((r) => (
           <Link
             key={r.slug}
             to="/retailer/$slug"

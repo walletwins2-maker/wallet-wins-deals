@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { CATEGORIES, DEALS, RETAILERS } from "@/lib/deals-data";
+import { CATEGORIES, RETAILERS } from "@/lib/deals-data";
+import { fetchDealsServer } from "@/lib/deals.functions";
 
 const BASE_URL = "";
 
@@ -8,12 +9,18 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        let deals: Array<{ id: string }> = [];
+        try {
+          deals = await fetchDealsServer();
+        } catch {
+          deals = [];
+        }
         const paths = [
           "/",
           "/deals",
           ...CATEGORIES.map((c) => `/category/${c.slug}`),
           ...RETAILERS.map((r) => `/retailer/${r.slug}`),
-          ...DEALS.map((d) => `/deal/${d.id}`),
+          ...deals.map((d) => `/deal/${d.id}`),
         ];
         const xml = [
           `<?xml version="1.0" encoding="UTF-8"?>`,

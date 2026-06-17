@@ -1,12 +1,15 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DealGrid } from "@/components/DealCard";
 import { dealsByRetailer, retailerBySlug } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 export const Route = createFileRoute("/retailer/$slug")({
-  loader: ({ params }) => {
-    const retailer = retailerBySlug(params.slug);
+  loader: async ({ params, context }) => {
+    const allDeals = await context.queryClient.ensureQueryData(dealsQueryOptions);
+    const deals = dealsByRetailer(allDeals, params.slug);
+    const retailer = retailerBySlug(params.slug, allDeals);
     if (!retailer) throw notFound();
-    return { retailer, deals: dealsByRetailer(params.slug) };
+    return { retailer, deals };
   },
   head: ({ loaderData, params }) => {
     const name = loaderData?.retailer?.name ?? params.slug;
@@ -21,6 +24,17 @@ export const Route = createFileRoute("/retailer/$slug")({
     };
   },
   component: RetailerPage,
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Couldn't load retailer</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Retailer not found</h1>
+    </div>
+  ),
 });
 
 function RetailerPage() {
