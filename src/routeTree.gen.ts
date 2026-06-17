@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -17,6 +18,11 @@ import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$id': typeof DealIdRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$id': typeof DealIdRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$id': typeof DealIdRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/deals'
     | '/search'
+    | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$id'
     | '/retailer/$slug'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/deals'
     | '/search'
+    | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$id'
     | '/retailer/$slug'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/deals'
     | '/search'
+    | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$id'
     | '/retailer/$slug'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DealsRoute: typeof DealsRoute
   SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealIdRoute: typeof DealIdRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
@@ -123,6 +136,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DealsRoute: DealsRoute,
   SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealIdRoute: DealIdRoute,
   RetailerSlugRoute: RetailerSlugRoute,
