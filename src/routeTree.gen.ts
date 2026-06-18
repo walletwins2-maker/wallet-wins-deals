@@ -15,7 +15,7 @@ import { Route as DealsRouteImport } from './routes/deals'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
-import { Route as DealIdRouteImport } from './routes/deal.$id'
+import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -48,9 +48,9 @@ const RetailerSlugRoute = RetailerSlugRouteImport.update({
   path: '/retailer/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DealIdRoute = DealIdRouteImport.update({
-  id: '/deal/$id',
-  path: '/deal/$id',
+const DealSlugRoute = DealSlugRouteImport.update({
+  id: '/deal/$slug',
+  path: '/deal/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -66,7 +66,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/deal/$id': typeof DealIdRoute
+  '/deal/$slug': typeof DealSlugRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesByTo {
@@ -76,7 +76,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/deal/$id': typeof DealIdRoute
+  '/deal/$slug': typeof DealSlugRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesById {
@@ -87,7 +87,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/deal/$id': typeof DealIdRoute
+  '/deal/$slug': typeof DealSlugRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRouteTypes {
@@ -99,7 +99,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/category/$slug'
-    | '/deal/$id'
+    | '/deal/$slug'
     | '/retailer/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -109,7 +109,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/category/$slug'
-    | '/deal/$id'
+    | '/deal/$slug'
     | '/retailer/$slug'
   id:
     | '__root__'
@@ -119,7 +119,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/category/$slug'
-    | '/deal/$id'
+    | '/deal/$slug'
     | '/retailer/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -130,7 +130,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CategorySlugRoute: typeof CategorySlugRoute
-  DealIdRoute: typeof DealIdRoute
+  DealSlugRoute: typeof DealSlugRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
 }
 
@@ -178,11 +178,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/deal/$id': {
-      id: '/deal/$id'
-      path: '/deal/$id'
-      fullPath: '/deal/$id'
-      preLoaderRoute: typeof DealIdRouteImport
+    '/deal/$slug': {
+      id: '/deal/$slug'
+      path: '/deal/$slug'
+      fullPath: '/deal/$slug'
+      preLoaderRoute: typeof DealSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -202,7 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CategorySlugRoute: CategorySlugRoute,
-  DealIdRoute: DealIdRoute,
+  DealSlugRoute: DealSlugRoute,
   RetailerSlugRoute: RetailerSlugRoute,
 }
 export const routeTree = rootRouteImport

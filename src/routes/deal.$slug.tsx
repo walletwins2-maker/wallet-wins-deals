@@ -13,7 +13,7 @@ import {
 } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
-export const Route = createFileRoute("/deal/$id")({
+export const Route = createFileRoute("/deal/$slug")({
   loader: async ({ params, context }) => {
     const deals = await context.queryClient.ensureQueryData(dealsQueryOptions);
     const deal = dealById(deals, params.id);
