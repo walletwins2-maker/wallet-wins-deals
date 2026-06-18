@@ -1,8 +1,22 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Wallet } from "lucide-react";
-import { CATEGORIES, RETAILERS } from "@/lib/deals-data";
+import { CATEGORIES, activeDeals, categoryBySlug, topRetailers } from "@/lib/deals-data";
+import { dealsQueryOptions } from "@/lib/deals-query";
 
 export function Footer() {
+  // useQuery (not Suspense) so the footer never blocks render; falls back to
+  // empty arrays during SSR / before the deals query resolves.
+  const { data: deals = [] } = useQuery({ ...dealsQueryOptions, retry: false });
+
+  const liveCategorySlugs = new Set(activeDeals(deals).map((d) => d.category));
+  const liveCategories = CATEGORIES.filter((c) => liveCategorySlugs.has(c.slug)).slice(0, 6);
+  const liveRetailers = topRetailers(deals, 6);
+
+  // Fallback to the static list if data hasn't loaded yet so the footer is
+  // never visibly empty.
+  const categories = liveCategories.length ? liveCategories : CATEGORIES.slice(0, 6);
+
   return (
     <footer className="mt-20 border-t border-border bg-muted/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
@@ -22,10 +36,10 @@ export function Footer() {
         <div>
           <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Categories</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {CATEGORIES.slice(0, 6).map((c) => (
+            {categories.map((c) => (
               <li key={c.slug}>
                 <Link to="/category/$slug" params={{ slug: c.slug }} className="hover:text-foreground">
-                  {c.name}
+                  {categoryBySlug(c.slug)?.name ?? c.name}
                 </Link>
               </li>
             ))}
@@ -34,13 +48,17 @@ export function Footer() {
         <div>
           <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Retailers</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {RETAILERS.slice(0, 6).map((r) => (
-              <li key={r.slug}>
-                <Link to="/retailer/$slug" params={{ slug: r.slug }} className="hover:text-foreground">
-                  {r.name}
-                </Link>
-              </li>
-            ))}
+            {liveRetailers.length === 0 ? (
+              <li className="italic opacity-60">Loading…</li>
+            ) : (
+              liveRetailers.map((r) => (
+                <li key={r.slug}>
+                  <Link to="/retailer/$slug" params={{ slug: r.slug }} className="hover:text-foreground">
+                    {r.name}
+                  </Link>
+                </li>
+              ))
+            )}
           </ul>
         </div>
         <div>
