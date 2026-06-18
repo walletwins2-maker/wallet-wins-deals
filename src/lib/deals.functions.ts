@@ -18,6 +18,7 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
     const qs = new URLSearchParams({
       select:
         "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
+      status: "in.(pending,queued)",
       order: "created_at.desc,id.desc",
       limit: "2000",
     });
