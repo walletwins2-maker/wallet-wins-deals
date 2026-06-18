@@ -86,6 +86,7 @@ function DealDetail() {
   const related = relatedDeals(deals, deal);
   const more = moreFromRetailer(deals, deal);
   const savings = deal.original_price - deal.price;
+  const hasDrop = deal.discount > 0 && savings > 0;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
@@ -97,9 +98,15 @@ function DealDetail() {
         <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-card">
           <div className="relative aspect-square bg-muted">
             <img src={deal.image_url} alt={deal.product_name} className="h-full w-full object-cover" />
-            <span className="absolute left-4 top-4 rounded-full bg-deal-badge px-3 py-1.5 text-sm font-bold text-white shadow">
-              -{deal.discount}% OFF
-            </span>
+            {hasDrop ? (
+              <span className="absolute left-4 top-4 rounded-full bg-deal-badge px-3 py-1.5 text-sm font-bold text-white shadow">
+                -{deal.discount}% OFF
+              </span>
+            ) : (
+              <span className="absolute left-4 top-4 rounded-full bg-gradient-primary px-3 py-1.5 text-sm font-bold text-primary-foreground shadow">
+                🔥 Hot Offer
+              </span>
+            )}
           </div>
         </div>
 
@@ -134,13 +141,19 @@ function DealDetail() {
               <span className="font-display text-4xl font-extrabold text-foreground">
                 {formatPrice(deal.price)}
               </span>
-              <span className="text-lg text-muted-foreground line-through">
-                {formatPrice(deal.original_price)}
-              </span>
+              {hasDrop && (
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatPrice(deal.original_price)}
+                </span>
+              )}
             </div>
-            <p className="mt-2 text-sm font-bold text-success">
-              You save {formatPrice(savings)} ({deal.discount}% off)
-            </p>
+            {hasDrop ? (
+              <p className="mt-2 text-sm font-bold text-success">
+                You save {formatPrice(savings)} ({deal.discount}% off)
+              </p>
+            ) : (
+              <p className="mt-2 text-sm font-bold text-primary">Hot Offer — limited time</p>
+            )}
 
             <div className="mt-4 flex items-center gap-3">
               <div className="flex-1 rounded-full bg-muted">
