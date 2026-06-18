@@ -7,7 +7,7 @@ export const Route = createFileRoute("/trust")({
       {
         name: "description",
         content:
-          "How Wallet Wins handles your data: what we collect when you browse deals or subscribe, the third-party services we rely on, and how to contact us about privacy.",
+          "How Wallet Wins handles your data: what we collect when you browse deals or subscribe, the third-party services we use, and how to contact us about privacy.",
       },
       { property: "og:title", content: "Trust & Privacy — Wallet Wins" },
       {

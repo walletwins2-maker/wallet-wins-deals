@@ -3,7 +3,7 @@ import type {} from "@tanstack/react-start";
 import { CATEGORIES, RETAILERS } from "@/lib/deals-data";
 import { fetchDealsServer } from "@/lib/deals.functions";
 
-const BASE_URL = "";
+const BASE_URL = "https://walletwins.shop";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/",
           "/deals",
           "/search",
+          "/trust",
           "/guides/costco-coupon-book",
           "/guides/liquidation-stores",
           "/guides/amazon-bin-stores",
