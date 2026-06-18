@@ -102,10 +102,13 @@ function titleHasWord(title: string, word: string): boolean {
 
 export function deriveCategory(name: string, retailerSlug?: string): string {
   const n = name.toLowerCase();
+  // Trusted retailer → category mappings win over title keywords, because
+  // titles often contain words that accidentally match other categories
+  // (e.g. a Frank & Eileen "Eileen Pan-Collared Shirt" matching "pan" → kitchen).
+  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) return RETAILER_CATEGORY[retailerSlug];
   for (const [slug, words] of CATEGORY_KEYWORDS) {
     if (words.some((w) => titleHasWord(n, w))) return slug;
   }
-  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) return RETAILER_CATEGORY[retailerSlug];
   return "other";
 }
 
