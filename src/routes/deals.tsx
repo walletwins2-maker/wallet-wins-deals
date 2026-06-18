@@ -18,7 +18,10 @@ const searchSchema = z.object({
   maxPrice: fallback(z.number().int().min(20).max(2000), 2000).default(2000),
   minDiscount: fallback(z.number().int().min(0).max(80), 0).default(0),
   sort: fallback(z.enum(SORTS), "best").default("best"),
+  page: fallback(z.number().int().min(1).max(50), 1).default(1),
 });
+
+const PAGE_SIZE = 24;
 
 export const Route = createFileRoute("/deals")({
   validateSearch: zodValidator(searchSchema),
@@ -43,11 +46,18 @@ export const Route = createFileRoute("/deals")({
 
 function DealsPage() {
   const { data: deals } = useSuspenseQuery(dealsQueryOptions);
-  const { q, retailer, category, maxPrice, minDiscount, sort } = Route.useSearch();
+  const { q, retailer, category, maxPrice, minDiscount, sort, page } = Route.useSearch();
   const navigate = useNavigate({ from: "/deals" });
   type SearchState = z.infer<typeof searchSchema>;
+  // Any filter/sort change resets page to 1; only the "Load more" button bumps page.
   const update = <K extends keyof SearchState>(key: K, value: SearchState[K]) =>
-    navigate({ search: (prev: SearchState) => ({ ...prev, [key]: value }) });
+    navigate({
+      search: (prev: SearchState) => ({
+        ...prev,
+        [key]: value,
+        ...(key === "page" ? null : { page: 1 }),
+      }),
+    });
 
   const RETAILERS = useMemo(() => topRetailers(deals, 20), [deals]);
 
@@ -85,6 +95,10 @@ function DealsPage() {
   const hasFilters =
     q !== "" || retailer !== "all" || category !== "all" || maxPrice !== 2000 || minDiscount !== 0;
 
+  const visibleCount = Math.min(filtered.length, page * PAGE_SIZE);
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -98,7 +112,15 @@ function DealsPage() {
           <button
             onClick={() =>
               navigate({
-                search: { q: "", retailer: "all", category: "all", maxPrice: 2000, minDiscount: 0, sort: "best" },
+                search: {
+                  q: "",
+                  retailer: "all",
+                  category: "all",
+                  maxPrice: 2000,
+                  minDiscount: 0,
+                  sort: "best",
+                  page: 1,
+                },
               })
             }
             className="inline-flex items-center gap-1.5 rounded-full border border-input bg-background px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary hover:text-foreground"
@@ -184,8 +206,31 @@ function DealsPage() {
       </div>
 
       <div className="mt-8">
-        <DealGrid deals={filtered} />
+        <DealGrid deals={visible} />
       </div>
+
+      {filtered.length > 0 && (
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <p className="text-xs text-muted-foreground">
+            Showing {visibleCount} of {filtered.length}
+          </p>
+          {hasMore ? (
+            <button
+              onClick={() => update("page", page + 1)}
+              className="inline-flex items-center justify-center rounded-full bg-gradient-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
+            >
+              Load more deals
+            </button>
+          ) : page > 1 ? (
+            <button
+              onClick={() => update("page", 1)}
+              className="text-xs font-semibold text-muted-foreground underline-offset-2 hover:underline"
+            >
+              Back to top
+            </button>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }
