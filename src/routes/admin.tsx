@@ -85,6 +85,71 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
+  const { authed } = Route.useLoaderData();
+  if (!authed) return <AdminLogin />;
+  return <AdminDashboard />;
+}
+
+function AdminLogin() {
+  const router = useRouter();
+  const login = useServerFn(loginAdmin);
+  const [token, setToken] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <div className="mx-auto max-w-sm px-4 py-20">
+      <h1 className="font-display text-2xl font-extrabold">Operator sign-in</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Enter the admin access token to view the dashboard.
+      </p>
+      <form
+        className="mt-6 space-y-3"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (busy) return;
+          setError(null);
+          setBusy(true);
+          try {
+            const res = await login({ data: { token } });
+            if (res.ok) {
+              setToken("");
+              await router.invalidate();
+            } else {
+              setError("Invalid token.");
+            }
+          } catch {
+            setError("Sign-in failed. Please try again.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <input
+          type="password"
+          autoComplete="current-password"
+          aria-label="Admin access token"
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          placeholder="Access token"
+          className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+        />
+        <button
+          type="submit"
+          disabled={busy || !token}
+          className="h-11 w-full rounded-lg bg-gradient-primary text-sm font-bold text-primary-foreground disabled:opacity-50"
+        >
+          {busy ? "Signing in…" : "Sign in"}
+        </button>
+        {error && <p className="text-xs text-red-500">{error}</p>}
+      </form>
+    </div>
+  );
+}
+
+function AdminDashboard() {
+  const router = useRouter();
+  const logout = useServerFn(logoutAdmin);
   const { data: allDeals } = useSuspenseQuery(dealsQueryOptions);
   const deals = activeDeals(allDeals);
   const today = deals.filter((d) => {
