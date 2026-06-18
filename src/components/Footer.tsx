@@ -1,21 +1,23 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
-import { CATEGORIES, activeDeals, categoryBySlug, topRetailers } from "@/lib/deals-data";
+import { CATEGORIES, activeDeals, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
 export function Footer() {
-  // useQuery (not Suspense) so the footer never blocks render; falls back to
-  // empty arrays during SSR / before the deals query resolves.
+  // Render a stable placeholder on the server and first client paint so SSR
+  // and hydration match exactly. After mount, swap in live data.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const { data: deals = [] } = useQuery({ ...dealsQueryOptions, retry: false });
 
   const liveCategorySlugs = new Set(activeDeals(deals).map((d) => d.category));
   const liveCategories = CATEGORIES.filter((c) => liveCategorySlugs.has(c.slug)).slice(0, 6);
   const liveRetailers = topRetailers(deals, 6);
 
-  // Fallback to the static list if data hasn't loaded yet so the footer is
-  // never visibly empty.
-  const categories = liveCategories.length ? liveCategories : CATEGORIES.slice(0, 6);
+  const showLive = hydrated && (liveCategories.length > 0 || liveRetailers.length > 0);
+  const categories = showLive && liveCategories.length ? liveCategories : CATEGORIES.slice(0, 6);
 
   return (
     <footer className="mt-20 border-t border-border bg-muted/40">
@@ -39,7 +41,7 @@ export function Footer() {
             {categories.map((c) => (
               <li key={c.slug}>
                 <Link to="/category/$slug" params={{ slug: c.slug }} className="hover:text-foreground">
-                  {categoryBySlug(c.slug)?.name ?? c.name}
+                  {c.name}
                 </Link>
               </li>
             ))}
@@ -48,8 +50,10 @@ export function Footer() {
         <div>
           <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Retailers</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {liveRetailers.length === 0 ? (
-              <li className="italic opacity-60">Loading…</li>
+            {!showLive ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <li key={i} className="opacity-40">—</li>
+              ))
             ) : (
               liveRetailers.map((r) => (
                 <li key={r.slug}>
