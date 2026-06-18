@@ -145,9 +145,14 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
   ["electronics", [
     "phone", "smartphone", "laptop", "tablet", "tv", "television", "headphone", "headphones", "earbud", "earbuds",
     "camera", "gopro", "drone", "computer", "pc", "desktop", "monitor", "speaker", "soundbar", "subwoofer",
-    "console", "playstation", "ps5", "xbox", "nintendo", "switch", "airpod", "airpods", "ipad", "iphone", "macbook",
+    "airpod", "airpods", "ipad", "iphone", "macbook",
     "kindle", "router", "modem", "ssd", "hdd", "gpu", "rtx", "keyboard", "mouse", "webcam", "charger", "smartwatch",
     "fitbit", "garmin", "alexa", "echo dot", "ring doorbell", "projector", "printer",
+  ]],
+  ["gaming", [
+    "console", "playstation", "ps5", "ps4", "xbox", "nintendo switch", "nintendo", "gamecube",
+    "controller", "gaming chair", "gaming headset", "gaming mouse", "gaming keyboard", "steam deck",
+    "video game", "videogame", "vr headset", "oculus", "meta quest",
   ]],
   ["kitchen", [
     "kitchen", "blender", "mixer", "stand mixer", "air fryer", "fryer", "oven", "microwave", "cookware", "bakeware",
@@ -190,11 +195,17 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     "fitness", "workout", "massage gun", "foam roller", "peloton", "resistance band", "pull up bar",
     "weight bench", "barbell",
   ]],
+  ["tools", [
+    "drill", "power tool", "power tools", "dewalt", "milwaukee", "ryobi", "makita", "tool set",
+    "hammer", "wrench", "screwdriver", "circular saw", "miter saw", "table saw", "tool box",
+    "lawn mower", "leaf blower", "string trimmer", "hedge trimmer", "chainsaw", "pressure washer",
+  ]],
   ["home", [
     "vacuum", "robot vacuum", "mattress", "bedding", "comforter", "sheet set", "duvet", "pillow",
     "rug", "lamp", "ceiling fan", "air purifier", "humidifier", "dehumidifier", "furniture", "sofa",
-    "couch", "sectional", "chair", "recliner", "decor", "curtain", "blind", "drill", "power tool",
-    "dewalt", "milwaukee", "broom", "mop", "storage bin", "shelving",
+    "couch", "sectional", "chair", "recliner", "decor", "curtain", "blind",
+    "broom", "mop", "storage bin", "shelving", "planter", "patio", "gazebo", "garden hose",
+    "bird feeder", "outdoor furniture", "raised bed",
   ]],
   ["pets", [
     "dog", "puppy", "cat", "kitten", "pet", "leash", "collar", "harness", "kibble", "dog food",
@@ -210,7 +221,7 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     "first aid", "thermometer", "blood pressure", "pulse oximeter", "cpap", "heating pad",
     "compression sock", "wellness",
   ]],
-  ["grocery", [
+  ["food-beverage", [
     "snack", "snacks", "cereal", "granola", "chocolate", "candy", "chips", "popcorn", "beverage",
     "soda", "sparkling water", "tea", "ground coffee", "coffee pod", "k-cup", "olive oil",
     "pasta", "rice", "seasoning", "spice", "sauce", "jerky", "protein bar",
@@ -219,37 +230,22 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     "car", "auto", "automotive", "tire", "tires", "motor oil", "wiper", "wiper blade", "dash cam",
     "jump starter", "car charger", "car mount", "car cover", "car seat cover", "obd", "garage",
   ]],
-  ["garden", [
-    "garden", "planter", "raised bed", "soil", "mulch", "fertilizer", "lawn mower", "leaf blower",
-    "string trimmer", "hedge trimmer", "seed", "seeds", "patio", "gazebo", "hose", "sprinkler",
-    "bird feeder", "outdoor furniture",
-  ]],
   ["office", [
     "office", "desk", "office chair", "standing desk", "monitor stand", "filing", "stationery",
     "notebook", "binder", "planner", "stapler", "shredder", "school supply", "school supplies",
-    "backpack", "lunch box", "calculator",
-  ]],
-  ["jewelry", [
-    "necklace", "bracelet", "earring", "earrings", "ring", "pendant", "diamond", "gold chain",
-    "silver chain", "watch", "rolex", "cartier", "engagement ring", "wedding band",
-  ]],
-  ["books", [
-    "book", "novel", "cookbook", "textbook", "audiobook", "kindle book", "ebook", "magazine",
-    "comic", "manga", "dvd", "blu-ray", "vinyl record",
-  ]],
-  ["music", [
-    "guitar", "acoustic guitar", "electric guitar", "bass guitar", "ukulele", "keyboard piano",
-    "digital piano", "drum kit", "drum set", "microphone", "midi controller", "audio interface",
-    "studio monitor", "synthesizer", "violin",
+    "lunch box", "calculator",
   ]],
   ["travel", [
     "luggage", "suitcase", "carry-on", "carry on", "travel bag", "duffel", "garment bag",
     "packing cube", "travel pillow", "passport holder",
   ]],
-  ["art", [
-    "art", "craft", "crafts", "paint set", "acrylic paint", "watercolor", "sketchbook",
-    "drawing pad", "colored pencil", "marker set", "easel", "canvas", "sewing machine", "knitting",
-    "crochet", "yarn", "embroidery", "scrapbook",
+  ["seasonal", [
+    "christmas", "christmas tree", "ornament", "advent calendar", "halloween", "halloween costume",
+    "easter", "thanksgiving", "valentine", "holiday decor", "string lights", "menorah",
+  ]],
+  ["fashion", [
+    "necklace", "bracelet", "earring", "earrings", "pendant", "diamond ring", "gold chain",
+    "silver chain", "engagement ring", "wedding band",
   ]],
 ];
 
