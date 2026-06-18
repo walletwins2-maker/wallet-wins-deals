@@ -49,19 +49,63 @@ export const CATEGORIES = [
 const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
   ["electronics", ["phone", "laptop", "tablet", "tv", "headphone", "earbud", "camera", "computer", "monitor", "speaker", "console", "watch", "airpod", "ipad", "iphone", "macbook", "kindle", "router"]],
   ["kitchen", ["kitchen", "blender", "mixer", "fryer", "oven", "cookware", "pan", "pot", "knife", "coffee", "espresso", "toaster", "instant pot", "vitamix", "ninja"]],
-  ["beauty", ["serum", "shampoo", "lotion", "makeup", "skincare", "cream", "perfume", "cosmetic", "lipstick", "mascara", "fragrance"]],
-  ["fashion", ["shirt", "pants", "jeans", "dress", "shoe", "sneaker", "jacket", "hoodie", "sock", "boot", "sandals", "watch band", "handbag", "wallet", "sunglasses", "hat"]],
+  ["beauty", ["serum", "shampoo", "conditioner", "lotion", "makeup", "skincare", "cream", "perfume", "cosmetic", "lipstick", "mascara", "fragrance", "wig", "lace front", "bundle deal", "hair extension", "weave"]],
+  ["fashion", [
+    // tops
+    "shirt", "t-shirt", "tee", "tshirt", "polo", "blouse", "tank", "tank top", "camisole", "cami", "sweater", "cardigan", "pullover", "sweatshirt", "hoodie", "vest",
+    // bottoms
+    "pants", "trouser", "chino", "chinos", "jeans", "denim", "shorts", "skirt", "leggings", "joggers", "sweatpants",
+    // dresses & sets
+    "dress", "gown", "romper", "jumpsuit", "suit", "blazer", "tuxedo",
+    // outerwear
+    "jacket", "coat", "parka", "windbreaker", "raincoat", "puffer",
+    // footwear
+    "shoe", "shoes", "sneaker", "sneakers", "boot", "boots", "sandal", "sandals", "loafer", "heels", "slipper", "slippers", "flats",
+    // accessories & underwear
+    "sock", "socks", "tie", "scarf", "belt", "glove", "gloves", "beanie", "cap", "hat", "sunglasses", "watch band", "handbag", "purse", "wallet", "bra", "panties", "underwear", "boxer", "briefs", "swimsuit", "bikini", "lingerie",
+    // generic apparel terms
+    "apparel", "clothing", "outfit",
+  ]],
   ["outdoor", ["tent", "camping", "hiking", "backpack", "tumbler", "cooler", "grill", "yeti", "stanley", "fishing"]],
   ["toys", ["lego", "toy", "doll", "puzzle", "game", "playset", "plush", "nerf", "hot wheel"]],
   ["fitness", ["dumbbell", "yoga", "treadmill", "bike", "fitness", "massage", "peloton", "resistance"]],
   ["home", ["vacuum", "robot", "mattress", "bedding", "rug", "lamp", "furniture", "sofa", "chair", "decor", "drill", "tool", "dewalt", "broom"]],
 ];
 
-export function deriveCategory(name: string): string {
+// Retailer-slug → default category. Only used when the title keywords don't match.
+const RETAILER_CATEGORY: Record<string, string> = {
+  // fashion
+  nike: "fashion", adidas: "fashion", puma: "fashion", "under-armour": "fashion",
+  gap: "fashion", "old-navy": "fashion", "banana-republic": "fashion",
+  nordstrom: "fashion", "nordstrom-rack": "fashion", macys: "fashion", kohls: "fashion",
+  uniqlo: "fashion", zara: "fashion", "h-and-m": "fashion", asos: "fashion",
+  shein: "fashion", lululemon: "fashion", "amanda-hair": "beauty",
+  // beauty
+  sephora: "beauty", ulta: "beauty",
+  // home / hardware
+  "home-depot": "home", lowes: "home", ikea: "home", wayfair: "home", "west-elm": "home",
+  // electronics
+  "best-buy": "electronics", newegg: "electronics", bhphotovideo: "electronics", apple: "electronics",
+  // outdoor
+  rei: "outdoor", "dicks-sporting-goods": "outdoor", "bass-pro-shops": "outdoor", patagonia: "outdoor",
+  // toys
+  "lego-shop": "toys",
+};
+
+// Use word-boundary matching so "shirt" doesn't match "t-shirt"-less strings
+// and "tie" doesn't match "tied"/"tier"/etc.
+function titleHasWord(title: string, word: string): boolean {
+  // Multi-word phrases: simple substring is fine (e.g. "tank top", "lace front").
+  if (word.includes(" ") || word.includes("-")) return title.includes(word);
+  return new RegExp(`\\b${word}\\b`, "i").test(title);
+}
+
+export function deriveCategory(name: string, retailerSlug?: string): string {
   const n = name.toLowerCase();
   for (const [slug, words] of CATEGORY_KEYWORDS) {
-    if (words.some((w) => n.includes(w))) return slug;
+    if (words.some((w) => titleHasWord(n, w))) return slug;
   }
+  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) return RETAILER_CATEGORY[retailerSlug];
   return "other";
 }
 
@@ -160,7 +204,7 @@ export function mapRawDeals(rows: RawDeal[]): Deal[] {
         retailer: info.slug,
         retailer_name: info.name,
         deal_score: Math.round(asNumber(r.deal_score)),
-        category: deriveCategory(name),
+        category: deriveCategory(name, info.slug),
         created_at: r.created_at ?? new Date().toISOString(),
         status: asStatus(r.status),
       };
