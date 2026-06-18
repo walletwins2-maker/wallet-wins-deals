@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Activity, Package, Store, Tag } from "lucide-react";
 import {
@@ -10,8 +11,34 @@ import {
 } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
+// Server-side token gate. The dashboard is operator-only; access requires
+// `?token=<ADMIN_DASHBOARD_TOKEN>` matching the server secret. Without a
+// configured secret the route is unavailable (returns 404).
+const verifyAdminToken = createServerFn({ method: "GET" })
+  .inputValidator((d: { token?: string }) => d)
+  .handler(async ({ data }) => {
+    const expected = process.env.ADMIN_DASHBOARD_TOKEN;
+    if (!expected) return { ok: false as const };
+    const provided = (data.token ?? "").trim();
+    if (!provided || provided.length !== expected.length) return { ok: false as const };
+    // Constant-time-ish compare
+    let mismatch = 0;
+    for (let i = 0; i < expected.length; i++) {
+      mismatch |= expected.charCodeAt(i) ^ provided.charCodeAt(i);
+    }
+    return { ok: mismatch === 0 };
+  });
+
 export const Route = createFileRoute("/admin")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
+  validateSearch: (search: Record<string, unknown>) => ({
+    token: typeof search.token === "string" ? search.token : undefined,
+  }),
+  loaderDeps: ({ search }) => ({ token: search.token }),
+  loader: async ({ context, deps }) => {
+    const result = await verifyAdminToken({ data: { token: deps.token } });
+    if (!result.ok) throw notFound();
+    return context.queryClient.ensureQueryData(dealsQueryOptions);
+  },
   head: () => ({
     meta: [
       { title: "Dashboard — Wallet Wins" },
@@ -20,6 +47,11 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   component: AdminPage,
+  notFoundComponent: () => (
+    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Not found</h1>
+    </div>
+  ),
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Couldn't load dashboard</h1>
