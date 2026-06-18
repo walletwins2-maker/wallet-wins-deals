@@ -117,30 +117,117 @@ export const subscribeNewsletterServer = createServerFn({ method: "POST" })
 
 async function sendWelcomeEmail(email: string) {
   const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) {
-    console.warn("[sendWelcomeEmail] LOVABLE_API_KEY not set; skipping");
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!apiKey || !supabaseUrl || !serviceKey) {
+    console.warn("[sendWelcomeEmail] missing env; skipping");
     return;
   }
-  const [{ render }, React, { sendLovableEmail }, { template }] = await Promise.all([
-    import("@react-email/components"),
-    import("react"),
-    import("@lovable.dev/email-js"),
-    import("./email-templates/welcome"),
-  ]);
+  const normalized = email.toLowerCase();
+  const [{ render }, React, { sendLovableEmail }, { template }, { createClient }] =
+    await Promise.all([
+      import("@react-email/components"),
+      import("react"),
+      import("@lovable.dev/email-js"),
+      import("./email-templates/welcome"),
+      import("@supabase/supabase-js"),
+    ]);
+  const supabase = createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  // 1. Suppression check — never send to bounced/complained/unsubscribed addresses.
+  const { data: suppressed } = await supabase
+    .from("suppressed_emails")
+    .select("id")
+    .eq("email", normalized)
+    .maybeSingle();
+  const messageId = crypto.randomUUID();
+  if (suppressed) {
+    await supabase.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: "welcome",
+      recipient_email: normalized,
+      status: "suppressed",
+    });
+    return;
+  }
+  // 2. Get-or-create unsubscribe token (one per email).
+  let unsubscribeToken: string;
+  const { data: existing } = await supabase
+    .from("email_unsubscribe_tokens")
+    .select("token, used_at")
+    .eq("email", normalized)
+    .maybeSingle();
+  if (existing?.used_at) {
+    // Token used = previously unsubscribed; treat as suppressed.
+    await supabase
+      .from("suppressed_emails")
+      .upsert({ email: normalized, reason: "unsubscribe" }, { onConflict: "email" });
+    await supabase.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: "welcome",
+      recipient_email: normalized,
+      status: "suppressed",
+    });
+    return;
+  }
+  if (existing) {
+    unsubscribeToken = existing.token;
+  } else {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    unsubscribeToken = Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+    await supabase
+      .from("email_unsubscribe_tokens")
+      .upsert({ token: unsubscribeToken, email: normalized }, {
+        onConflict: "email",
+        ignoreDuplicates: true,
+      });
+    const { data: stored } = await supabase
+      .from("email_unsubscribe_tokens")
+      .select("token")
+      .eq("email", normalized)
+      .maybeSingle();
+    if (stored?.token) unsubscribeToken = stored.token;
+  }
   const element = React.createElement(template.component, template.previewData ?? {});
   const html = await render(element);
   const text = `Welcome to Wallet Wins!\n\nThanks for subscribing. Browse today's top deals at https://walletwins.shop/deals`;
-  const { subject } = template;
-  await sendLovableEmail(
-    {
-      to: email,
-      from: `Wallet Wins <hello@notify.walletwins.shop>`,
-      sender_domain: "notify.walletwins.shop",
-      subject,
-      html,
-      text,
-      idempotency_key: `welcome:${email}`,
-    },
-    { apiKey },
-  );
+  await supabase.from("email_send_log").insert({
+    message_id: messageId,
+    template_name: "welcome",
+    recipient_email: normalized,
+    status: "pending",
+  });
+  try {
+    await sendLovableEmail(
+      {
+        to: normalized,
+        from: `Wallet Wins <hello@notify.walletwins.shop>`,
+        sender_domain: "notify.walletwins.shop",
+        subject: template.subject as string,
+        html,
+        text,
+        idempotency_key: `welcome:${normalized}`,
+        unsubscribe_token: unsubscribeToken,
+        message_id: messageId,
+      },
+      { apiKey },
+    );
+    await supabase.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: "welcome",
+      recipient_email: normalized,
+      status: "sent",
+    });
+  } catch (err) {
+    await supabase.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: "welcome",
+      recipient_email: normalized,
+      status: "failed",
+      error_message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 }
