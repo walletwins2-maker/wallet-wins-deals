@@ -108,5 +108,40 @@ export const subscribeNewsletterServer = createServerFn({ method: "POST" })
       console.error("[subscribeNewsletterServer] upstream error", res.status, body.slice(0, 500));
       return { ok: false as const, error: "Subscription failed. Please try again." };
     }
+    // Fire-and-forget welcome email. Never block / fail the subscribe response on this.
+    void sendWelcomeEmail(email).catch((err) => {
+      console.error("[subscribeNewsletterServer] welcome email failed", err);
+    });
     return { ok: true as const };
   });
+
+async function sendWelcomeEmail(email: string) {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) {
+    console.warn("[sendWelcomeEmail] LOVABLE_API_KEY not set; skipping");
+    return;
+  }
+  const [{ renderAsync }, React, { sendLovableEmail }, { template }] = await Promise.all([
+    import("@react-email/components"),
+    import("react"),
+    import("@lovable.dev/email-js"),
+    import("./email-templates/welcome"),
+  ]);
+  const element = React.createElement(template.component, template.previewData ?? {});
+  const html = await renderAsync(element);
+  const text = `Welcome to Wallet Wins!\n\nThanks for subscribing. Browse today's top deals at https://walletwins.shop/deals`;
+  const subject =
+    typeof template.subject === "function" ? template.subject({}) : template.subject;
+  await sendLovableEmail(
+    {
+      to: email,
+      from: `Wallet Wins <hello@notify.walletwins.shop>`,
+      sender_domain: "notify.walletwins.shop",
+      subject,
+      html,
+      text,
+      idempotency_key: `welcome:${email}`,
+    },
+    { apiKey },
+  );
+}
