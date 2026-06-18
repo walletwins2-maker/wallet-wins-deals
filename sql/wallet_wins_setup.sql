@@ -73,7 +73,7 @@ create or replace view public.live_deals as
 select *
 from public.deals_to_post
 where status in ('pending', 'queued')
-  and created_at >= now() - interval '7 days';
+  and created_at >= now() - interval '30 days';
 
 -- Allow anon + authenticated to read the public view.
 grant select on public.live_deals to anon, authenticated;
@@ -103,6 +103,12 @@ create index if not exists deals_to_post_retailer_idx
 
 create index if not exists deals_to_post_deal_score_idx
   on public.deals_to_post (deal_score desc nulls last);
+
+CREATE INDEX IF NOT EXISTS deals_to_post_fingerprint_idx
+ON public.deals_to_post (product_fingerprint);
+
+CREATE INDEX IF NOT EXISTS deals_to_post_retailer_status_idx
+ON public.deals_to_post (retailer, status);
 
 -- If your table has final_score / discount columns, these speed up sorts.
 do $$
