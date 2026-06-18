@@ -3,7 +3,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Activity, Package, Store, Tag } from "lucide-react";
+import { Activity, Download, Package, Store, Tag } from "lucide-react";
 import {
   CATEGORIES,
   activeDeals,
@@ -60,6 +60,88 @@ const logoutAdmin = createServerFn({ method: "POST" }).handler(async () => {
   deleteCookie(ADMIN_COOKIE, { path: "/" });
   return { ok: true as const };
 });
+
+// CSV export of affiliate_clicks for a date range + optional retailer filter.
+// Gated by the same HttpOnly admin cookie as the dashboard itself; returns an
+// error envelope (never throws schema details) when unauthorized or upstream
+// fails.
+function isoBoundary(input: string, end: boolean): string | null {
+  // Accept YYYY-MM-DD; normalize to a full-day UTC boundary.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) return null;
+  return end ? `${input}T23:59:59.999Z` : `${input}T00:00:00.000Z`;
+}
+
+function csvEscape(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  const s = String(value);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+const exportAffiliateClicks = createServerFn({ method: "POST" })
+  .inputValidator((d: { startDate: string; endDate: string; retailer?: string }) => d)
+  .handler(async ({ data }) => {
+    const expected = process.env.ADMIN_DASHBOARD_TOKEN;
+    const cookie = getCookie(ADMIN_COOKIE);
+    if (!expected || !cookie || !constantTimeEqual(cookie, expected)) {
+      return { ok: false as const, error: "Unauthorized." };
+    }
+    const url = process.env.WALLETWINS_DB_URL;
+    const key = process.env.WALLETWINS_DB_ANON_KEY;
+    if (!url || !key) {
+      return { ok: false as const, error: "Backend not configured." };
+    }
+    const start = isoBoundary(data.startDate, false);
+    const end = isoBoundary(data.endDate, true);
+    if (!start || !end) {
+      return { ok: false as const, error: "Invalid date range." };
+    }
+    const qs = new URLSearchParams({
+      select:
+        "id,deal_id,product_fingerprint,retailer,source_page,referrer,created_at",
+      order: "created_at.desc",
+      limit: "50000",
+    });
+    qs.append("created_at", `gte.${start}`);
+    qs.append("created_at", `lte.${end}`);
+    if (data.retailer && data.retailer.trim()) {
+      qs.append("retailer", `eq.${data.retailer.trim()}`);
+    }
+    const res = await fetch(`${url}/rest/v1/affiliate_clicks?${qs.toString()}`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+      },
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("[exportAffiliateClicks] upstream error", res.status, body.slice(0, 500));
+      return { ok: false as const, error: "Export failed. Please try again." };
+    }
+    const rows = (await res.json()) as Array<Record<string, unknown>>;
+    const headers = [
+      "id",
+      "deal_id",
+      "product_fingerprint",
+      "retailer",
+      "source_page",
+      "referrer",
+      "created_at",
+    ];
+    const lines = [headers.join(",")];
+    for (const row of rows) {
+      lines.push(headers.map((h) => csvEscape(row[h])).join(","));
+    }
+    return {
+      ok: true as const,
+      csv: lines.join("\n"),
+      count: rows.length,
+      filename: `affiliate_clicks_${data.startDate}_to_${data.endDate}${
+        data.retailer ? `_${data.retailer}` : ""
+      }.csv`,
+    };
+  });
 
 export const Route = createFileRoute("/admin")({
   loader: async ({ context }) => {
