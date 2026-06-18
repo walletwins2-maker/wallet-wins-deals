@@ -54,11 +54,11 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     // tops
     "shirt", "t-shirt", "tee", "tshirt", "polo", "blouse", "tank", "tank top", "camisole", "cami", "sweater", "cardigan", "pullover", "sweatshirt", "hoodie", "vest",
     // bottoms
-    "pants", "trouser", "chino", "chinos", "jeans", "denim", "shorts", "skirt", "leggings", "joggers", "sweatpants",
+    "pant", "pants", "trouser", "trousers", "chino", "chinos", "jeans", "denim", "shorts", "skirt", "leggings", "joggers", "sweatpants",
     // dresses & sets
     "dress", "gown", "romper", "jumpsuit", "suit", "blazer", "tuxedo",
     // outerwear
-    "jacket", "coat", "parka", "windbreaker", "raincoat", "puffer",
+    "jacket", "coat", "coats", "overcoat", "trench", "parka", "windbreaker", "raincoat", "puffer",
     // footwear
     "shoe", "shoes", "sneaker", "sneakers", "boot", "boots", "sandal", "sandals", "loafer", "heels", "slipper", "slippers", "flats",
     // accessories & underwear
