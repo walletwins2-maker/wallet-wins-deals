@@ -477,9 +477,28 @@ export function liveCategories(deals: Deal[]): Array<(typeof CATEGORIES)[number]
 }
 
 export function topDeals(deals: Deal[], limit = 8) {
-  return [...activeDeals(deals)]
-    .sort((a, b) => b.deal_score - a.deal_score || b.discount - a.discount)
-    .slice(0, limit);
+  const ranked = [...activeDeals(deals)].sort(
+    (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
+  );
+  // Diversify by retailer: take the best deal per retailer first (round-robin),
+  // then top up with the next-best remaining deals if we still need more.
+  const picked: Deal[] = [];
+  const seenRetailers = new Set<string>();
+  for (const d of ranked) {
+    if (picked.length >= limit) break;
+    if (seenRetailers.has(d.retailer)) continue;
+    picked.push(d);
+    seenRetailers.add(d.retailer);
+  }
+  if (picked.length < limit) {
+    const pickedIds = new Set(picked.map((d) => d.id));
+    for (const d of ranked) {
+      if (picked.length >= limit) break;
+      if (pickedIds.has(d.id)) continue;
+      picked.push(d);
+    }
+  }
+  return picked;
 }
 
 export function recentDrops(deals: Deal[], limit = 8) {
