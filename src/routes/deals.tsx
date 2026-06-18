@@ -1,18 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { useMemo } from "react";
+import { Search, X } from "lucide-react";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { DealGrid } from "@/components/DealCard";
-import {
-  CATEGORIES,
-  activeDeals,
-  topRetailers,
-} from "@/lib/deals-data";
+import { CATEGORIES, activeDeals, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
-type Sort = "best" | "newest" | "discount" | "price";
+const SORTS = ["best", "newest", "discount", "price"] as const;
+type Sort = (typeof SORTS)[number];
+
+const searchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+  retailer: fallback(z.string(), "all").default("all"),
+  category: fallback(z.string(), "all").default("all"),
+  maxPrice: fallback(z.number().int().min(20).max(2000), 2000).default(2000),
+  minDiscount: fallback(z.number().int().min(0).max(80), 0).default(0),
+  sort: fallback(z.enum(SORTS), "best").default("best"),
+});
 
 export const Route = createFileRoute("/deals")({
+  validateSearch: zodValidator(searchSchema),
   loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
@@ -34,13 +43,13 @@ export const Route = createFileRoute("/deals")({
 
 function DealsPage() {
   const { data: deals } = useSuspenseQuery(dealsQueryOptions);
+  const { q, retailer, category, maxPrice, minDiscount, sort } = Route.useSearch();
+  const navigate = useNavigate({ from: "/deals" });
+  type SearchState = z.infer<typeof searchSchema>;
+  const update = <K extends keyof SearchState>(key: K, value: SearchState[K]) =>
+    navigate({ search: (prev: SearchState) => ({ ...prev, [key]: value }) });
+
   const RETAILERS = useMemo(() => topRetailers(deals, 20), [deals]);
-  const [q, setQ] = useState("");
-  const [retailer, setRetailer] = useState("all");
-  const [category, setCategory] = useState("all");
-  const [maxPrice, setMaxPrice] = useState(2000);
-  const [minDiscount, setMinDiscount] = useState(0);
-  const [sort, setSort] = useState<Sort>("best");
 
   const filtered = useMemo(() => {
     let list = activeDeals(deals);
@@ -53,52 +62,77 @@ function DealsPage() {
     list = list.filter((d) => d.price <= maxPrice && d.discount >= minDiscount);
     switch (sort) {
       case "newest":
-        list.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
+        list = [...list].sort(
+          (a, b) =>
+            +new Date(b.created_at) - +new Date(a.created_at) ||
+            b.id.localeCompare(a.id),
+        );
         break;
       case "discount":
-        list.sort((a, b) => b.discount - a.discount);
+        list = [...list].sort((a, b) => b.discount - a.discount || b.id.localeCompare(a.id));
         break;
       case "price":
-        list.sort((a, b) => a.price - b.price);
+        list = [...list].sort((a, b) => a.price - b.price || a.id.localeCompare(b.id));
         break;
       default:
-        list.sort((a, b) => b.deal_score - a.deal_score);
+        list = [...list].sort(
+          (a, b) => b.deal_score - a.deal_score || b.discount - a.discount || b.id.localeCompare(a.id),
+        );
     }
     return list;
   }, [deals, q, retailer, category, maxPrice, minDiscount, sort]);
 
+  const hasFilters =
+    q !== "" || retailer !== "all" || category !== "all" || maxPrice !== 2000 || minDiscount !== 0;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="font-display text-3xl font-extrabold sm:text-4xl">All Deals</h1>
-      <p className="mt-1 text-muted-foreground">
-        {filtered.length} deals — sorted by {sortLabel(sort)}
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-extrabold sm:text-4xl">All Deals</h1>
+          <p className="mt-1 text-muted-foreground">
+            {filtered.length} deals — sorted by {sortLabel(sort)}
+          </p>
+        </div>
+        {hasFilters && (
+          <button
+            onClick={() =>
+              navigate({
+                search: { q: "", retailer: "all", category: "all", maxPrice: 2000, minDiscount: 0, sort: "best" },
+              })
+            }
+            className="inline-flex items-center gap-1.5 rounded-full border border-input bg-background px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" /> Clear filters
+          </button>
+        )}
+      </div>
 
       <div className="mt-6 grid gap-3 rounded-2xl border border-border bg-card p-4 shadow-card md:grid-cols-[1fr_auto_auto_auto]">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => update("q", e.target.value)}
             placeholder="Search products…"
             className="h-10 w-full rounded-full border border-input bg-background pl-10 pr-4 text-sm outline-none focus:border-primary"
           />
         </div>
         <select
           value={retailer}
-          onChange={(e) => setRetailer(e.target.value)}
+          onChange={(e) => update("retailer", e.target.value)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
         >
           <option value="all">All retailers</option>
           {RETAILERS.map((r) => (
             <option key={r.slug} value={r.slug}>
-              {r.name}
+              {r.name} ({r.count})
             </option>
           ))}
         </select>
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => update("category", e.target.value)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
         >
           <option value="all">All categories</option>
@@ -110,7 +144,7 @@ function DealsPage() {
         </select>
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value as Sort)}
+          onChange={(e) => update("sort", e.target.value as Sort)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
         >
           <option value="best">Best Deals</option>
@@ -129,7 +163,7 @@ function DealsPage() {
             max={2000}
             step={10}
             value={maxPrice}
-            onChange={(e) => setMaxPrice(+e.target.value)}
+            onChange={(e) => update("maxPrice", +e.target.value)}
             className="mt-1 w-full accent-[var(--primary)]"
           />
         </div>
@@ -143,7 +177,7 @@ function DealsPage() {
             max={80}
             step={5}
             value={minDiscount}
-            onChange={(e) => setMinDiscount(+e.target.value)}
+            onChange={(e) => update("minDiscount", +e.target.value)}
             className="mt-1 w-full accent-[var(--primary)]"
           />
         </div>
