@@ -301,14 +301,16 @@ function titleHasWord(title: string, word: string): boolean {
   return new RegExp(`\\b${word}\\b`, "i").test(title);
 }
 
-export function deriveCategory(name: string, retailerSlug?: string): string {
+export function deriveCategory(name: string, retailerSlug?: string): CategorySlug {
   const n = name.toLowerCase();
   // Trusted retailer → category mappings win over title keywords, because
   // titles often contain words that accidentally match other categories
   // (e.g. a Frank & Eileen "Eileen Pan-Collared Shirt" matching "pan" → kitchen).
-  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) return RETAILER_CATEGORY[retailerSlug];
+  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) {
+    return normalizeCategory(RETAILER_CATEGORY[retailerSlug]);
+  }
   for (const [slug, words] of CATEGORY_KEYWORDS) {
-    if (words.some((w) => titleHasWord(n, w))) return slug;
+    if (words.some((w) => titleHasWord(n, w))) return normalizeCategory(slug);
   }
   return "other";
 }
@@ -430,6 +432,23 @@ export function dealsByRetailer(deals: Deal[], slug: string) {
 
 export function dealsByCategory(deals: Deal[], slug: string) {
   return activeDeals(deals).filter((d) => d.category === slug);
+}
+
+export function categoryCounts(deals: Deal[]): Map<CategorySlug, number> {
+  const counts = new Map<CategorySlug, number>();
+  for (const d of activeDeals(deals)) {
+    const slug = normalizeCategory(d.category);
+    counts.set(slug, (counts.get(slug) ?? 0) + 1);
+  }
+  return counts;
+}
+
+export function liveCategories(deals: Deal[]): Array<(typeof CATEGORIES)[number] & { count: number }> {
+  const counts = categoryCounts(deals);
+  return CATEGORIES.filter((c) => (counts.get(c.slug) ?? 0) > 0).map((c) => ({
+    ...c,
+    count: counts.get(c.slug) ?? 0,
+  }));
 }
 
 export function topDeals(deals: Deal[], limit = 8) {
