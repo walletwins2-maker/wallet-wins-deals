@@ -15,6 +15,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Dashboard — Wallet Wins" },
+      { name: "description", content: "Internal Wallet Wins dashboard for monitoring active deals, retailers, categories, and recent click activity." },
       { name: "robots", content: "noindex" },
     ],
   }),
