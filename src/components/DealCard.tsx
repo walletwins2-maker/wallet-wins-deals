@@ -38,9 +38,9 @@ export function DealCard({ deal }: { deal: Deal }) {
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {retailer?.name ?? deal.retailer}
         </p>
-        <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary">
+        <h2 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary">
           {deal.product_name}
-        </h3>
+        </h2>
         <div className="mt-auto flex items-baseline gap-2 pt-2">
           <span className="text-lg font-bold text-foreground">{formatPrice(deal.price)}</span>
           {hasDrop && (

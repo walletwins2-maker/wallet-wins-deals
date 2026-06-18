@@ -135,6 +135,7 @@ function DealsPage() {
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
+            aria-label="Search products"
             value={q}
             onChange={(e) => update("q", e.target.value)}
             placeholder="Search products…"
@@ -142,6 +143,7 @@ function DealsPage() {
           />
         </div>
         <select
+          aria-label="Filter by retailer"
           value={retailer}
           onChange={(e) => update("retailer", e.target.value)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
@@ -154,6 +156,7 @@ function DealsPage() {
           ))}
         </select>
         <select
+          aria-label="Filter by category"
           value={category}
           onChange={(e) => update("category", e.target.value)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
@@ -166,6 +169,7 @@ function DealsPage() {
           ))}
         </select>
         <select
+          aria-label="Sort deals"
           value={sort}
           onChange={(e) => update("sort", e.target.value as Sort)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
@@ -177,10 +181,11 @@ function DealsPage() {
         </select>
 
         <div className="md:col-span-2">
-          <label className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+          <label htmlFor="max-price" className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
             Max price <span>${maxPrice}</span>
           </label>
           <input
+            id="max-price"
             type="range"
             min={20}
             max={2000}
@@ -191,10 +196,11 @@ function DealsPage() {
           />
         </div>
         <div className="md:col-span-2">
-          <label className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+          <label htmlFor="min-discount" className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
             Min discount <span>{minDiscount}%</span>
           </label>
           <input
+            id="min-discount"
             type="range"
             min={0}
             max={80}

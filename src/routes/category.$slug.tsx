@@ -75,6 +75,7 @@ function CategoryPage() {
           </div>
         </div>
         <select
+          aria-label="Sort deals"
           value={sort}
           onChange={(e) => setSort(e.target.value as Sort)}
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
