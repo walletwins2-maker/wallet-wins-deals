@@ -20,24 +20,38 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
         "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
       status: "in.(pending,queued)",
       order: "created_at.desc,id.desc",
-      limit: "2000",
+      limit: "1000",
     });
-    const res = await fetch(`${url}/rest/v1/live_deals?${qs.toString()}`, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        Accept: "application/json",
-        // PostgREST defaults to 1000 rows max; ask for a larger window.
-        "Range-Unit": "items",
-        Prefer: "count=none",
-      },
-    });
+    const endpoint = `${url}/rest/v1/live_deals?${qs.toString()}`;
+    const doFetch = () =>
+      fetch(endpoint, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          Accept: "application/json",
+          "Range-Unit": "items",
+          Prefer: "count=none",
+        },
+      });
+    let res: Response;
+    try {
+      res = await doFetch();
+      // Retry once on transient upstream failure (e.g. statement timeout 57014).
+      if (!res.ok && (res.status >= 500 || res.status === 408)) {
+        const body = await res.text();
+        console.error("[fetchDealsServer] upstream error, retrying", res.status, body.slice(0, 300));
+        res = await doFetch();
+      }
+    } catch (err) {
+      console.error("[fetchDealsServer] network error", err);
+      return [];
+    }
     if (!res.ok) {
       const body = await res.text();
-      // Log raw provider response server-side only; never leak schema/error
-      // details (column/constraint/relation names) to the browser.
+      // Log server-side; never leak provider error details to the browser.
+      // Return an empty list so the page still renders instead of 500-ing.
       console.error("[fetchDealsServer] upstream error", res.status, body.slice(0, 500));
-      throw new Error("Failed to load deals. Please try again.");
+      return [];
     }
     const rows = (await res.json()) as RawDeal[];
     return mapRawDeals(rows);
