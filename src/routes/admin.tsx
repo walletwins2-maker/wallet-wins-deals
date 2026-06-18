@@ -232,6 +232,7 @@ function AdminLogin() {
 function AdminDashboard() {
   const router = useRouter();
   const logout = useServerFn(logoutAdmin);
+  const exportClicks = useServerFn(exportAffiliateClicks);
   const { data: allDeals } = useSuspenseQuery(dealsQueryOptions);
   const deals = activeDeals(allDeals);
   const today = deals.filter((d) => {
@@ -240,6 +241,11 @@ function AdminDashboard() {
   });
 
   const byRetailer = topRetailers(deals, 50);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
 
   const byCategory = CATEGORIES.map((c) => ({
     ...c,
@@ -344,6 +350,13 @@ function AdminDashboard() {
           </ul>
         )}
       </Panel>
+
+      <ExportClicksPanel
+        defaultStart={sevenDaysAgo}
+        defaultEnd={today}
+        retailers={byRetailer.filter((r) => r.count > 0)}
+        onExport={exportClicks}
+      />
 
       <Panel title="Highest-Score Deals" className="mt-6">
         <ul className="divide-y divide-border text-sm">
