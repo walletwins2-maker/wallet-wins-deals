@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 import { DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
-import { CATEGORIES, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
+import { CATEGORIES, activeDeals, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
 export const Route = createFileRoute("/")({
@@ -32,6 +32,8 @@ function Index() {
   const featured = topDeals(deals, 8);
   const drops = recentDrops(deals, 8);
   const retailers = topRetailers(deals, 8);
+  const liveCategorySlugs = new Set(activeDeals(deals).map((d) => d.category));
+  const liveCategories = CATEGORIES.filter((c) => liveCategorySlugs.has(c.slug));
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
@@ -92,9 +94,11 @@ function Index() {
       </div>
 
       {/* Categories */}
-      <SectionHeader title="Popular Categories" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {CATEGORIES.map((c) => (
+      {liveCategories.length > 0 && (
+        <>
+          <SectionHeader title="Popular Categories" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {liveCategories.map((c) => (
           <Link
             key={c.slug}
             to="/category/$slug"
@@ -109,8 +113,10 @@ function Index() {
               <p className="text-xs text-muted-foreground">Shop now</p>
             </div>
           </Link>
-        ))}
-      </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Recent drops */}
       <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} />
