@@ -4,6 +4,8 @@ import { formatPrice, retailerBySlug } from "@/lib/deals-data";
 
 export function DealCard({ deal }: { deal: Deal }) {
   const retailer = retailerBySlug(deal.retailer);
+  const savings = deal.original_price - deal.price;
+  const hasDrop = deal.discount > 0 && savings > 0;
   return (
     <Link
       to="/deal/$slug"
@@ -17,9 +19,15 @@ export function DealCard({ deal }: { deal: Deal }) {
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-deal-badge px-2.5 py-1 text-xs font-bold text-white shadow-sm">
-          -{deal.discount}%
-        </span>
+        {hasDrop ? (
+          <span className="absolute left-3 top-3 rounded-full bg-deal-badge px-2.5 py-1 text-xs font-bold text-white shadow-sm">
+            -{deal.discount}%
+          </span>
+        ) : (
+          <span className="absolute left-3 top-3 rounded-full bg-gradient-primary px-2.5 py-1 text-xs font-bold text-primary-foreground shadow-sm">
+            🔥 Hot Offer
+          </span>
+        )}
         {deal.deal_score >= 90 && (
           <span className="absolute right-3 top-3 rounded-full bg-gradient-primary px-2.5 py-1 text-xs font-bold text-primary-foreground shadow-sm">
             🔥 HOT
@@ -35,13 +43,17 @@ export function DealCard({ deal }: { deal: Deal }) {
         </h3>
         <div className="mt-auto flex items-baseline gap-2 pt-2">
           <span className="text-lg font-bold text-foreground">{formatPrice(deal.price)}</span>
-          <span className="text-xs text-muted-foreground line-through">
-            {formatPrice(deal.original_price)}
-          </span>
+          {hasDrop && (
+            <span className="text-xs text-muted-foreground line-through">
+              {formatPrice(deal.original_price)}
+            </span>
+          )}
         </div>
-        <p className="text-xs font-semibold text-success">
-          Save {formatPrice(deal.original_price - deal.price)}
-        </p>
+        {hasDrop ? (
+          <p className="text-xs font-semibold text-success">Save {formatPrice(savings)}</p>
+        ) : (
+          <p className="text-xs font-semibold text-primary">Hot Offer</p>
+        )}
       </div>
     </Link>
   );
