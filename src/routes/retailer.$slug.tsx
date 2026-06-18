@@ -50,7 +50,7 @@ export const Route = createFileRoute("/retailer/$slug")({
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Couldn't load retailer</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">Something went wrong. Please try again.</p>
     </div>
   ),
   notFoundComponent: () => (

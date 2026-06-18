@@ -20,7 +20,7 @@ export const Route = createFileRoute("/search")({
   component: SearchPage,
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-      <p className="text-sm text-muted-foreground">{error.message}</p>
+      <p className="text-sm text-muted-foreground">Something went wrong. Please try again.</p>
     </div>
   ),
 });
