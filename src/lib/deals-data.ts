@@ -179,6 +179,7 @@ const RETAILER_CATEGORY: Record<string, string> = {
   uniqlo: "fashion", zara: "fashion", "h-and-m": "fashion", asos: "fashion",
   shein: "fashion", lululemon: "fashion", "frank-eileen": "fashion", "frank-and-eileen": "fashion",
   zapaka: "fashion", "free-people": "fashion", anthropologie: "fashion", "j-crew": "fashion",
+  missacc: "fashion", "miss-acc": "fashion",
   madewell: "fashion", everlane: "fashion", reformation: "fashion", "tommy-hilfiger": "fashion",
   "ralph-lauren": "fashion", "calvin-klein": "fashion", levis: "fashion",
   // beauty
