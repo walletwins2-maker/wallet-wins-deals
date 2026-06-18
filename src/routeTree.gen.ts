@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as DealsRouteImport } from './routes/deals'
@@ -21,6 +22,11 @@ import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazo
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
+const TrustRoute = TrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/deals': typeof DealsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trust': typeof TrustRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/deals': typeof DealsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trust': typeof TrustRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/deals': typeof DealsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trust': typeof TrustRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/deals'
     | '/search'
     | '/sitemap.xml'
+    | '/trust'
     | '/category/$slug'
     | '/deal/$slug'
     | '/guides/amazon-bin-stores'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/deals'
     | '/search'
     | '/sitemap.xml'
+    | '/trust'
     | '/category/$slug'
     | '/deal/$slug'
     | '/guides/amazon-bin-stores'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/deals'
     | '/search'
     | '/sitemap.xml'
+    | '/trust'
     | '/category/$slug'
     | '/deal/$slug'
     | '/guides/amazon-bin-stores'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   DealsRoute: typeof DealsRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TrustRoute: typeof TrustRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
   GuidesAmazonBinStoresRoute: typeof GuidesAmazonBinStoresRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trust': {
+      id: '/trust'
+      path: '/trust'
+      fullPath: '/trust'
+      preLoaderRoute: typeof TrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   DealsRoute: DealsRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TrustRoute: TrustRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
   GuidesAmazonBinStoresRoute: GuidesAmazonBinStoresRoute,
