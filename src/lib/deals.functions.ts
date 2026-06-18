@@ -19,13 +19,16 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
       select:
         "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
       order: "created_at.desc,id.desc",
-      limit: "300",
+      limit: "2000",
     });
     const res = await fetch(`${url}/rest/v1/live_deals?${qs.toString()}`, {
       headers: {
         apikey: key,
         Authorization: `Bearer ${key}`,
         Accept: "application/json",
+        // PostgREST defaults to 1000 rows max; ask for a larger window.
+        "Range-Unit": "items",
+        Prefer: "count=none",
       },
     });
     if (!res.ok) {
