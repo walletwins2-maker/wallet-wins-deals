@@ -399,3 +399,122 @@ function Panel({ title, className = "", children }: { title: string; className?:
     </div>
   );
 }
+
+function ExportClicksPanel({
+  defaultStart,
+  defaultEnd,
+  retailers,
+  onExport,
+}: {
+  defaultStart: string;
+  defaultEnd: string;
+  retailers: Array<{ slug: string; name: string }>;
+  onExport: (args: {
+    data: { startDate: string; endDate: string; retailer?: string };
+  }) => Promise<
+    | { ok: true; csv: string; filename: string; count: number }
+    | { ok: false; error: string }
+  >;
+}) {
+  const [startDate, setStartDate] = useState(defaultStart);
+  const [endDate, setEndDate] = useState(defaultEnd);
+  const [retailer, setRetailer] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  return (
+    <Panel title="Export Affiliate Clicks" className="mt-6">
+      <p className="mb-4 text-sm text-muted-foreground">
+        Download a CSV of click events for the selected date range and retailer.
+      </p>
+      <form
+        className="grid gap-3 sm:grid-cols-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (busy) return;
+          setBusy(true);
+          setMsg(null);
+          setErr(null);
+          try {
+            const res = await onExport({
+              data: {
+                startDate,
+                endDate,
+                retailer: retailer || undefined,
+              },
+            });
+            if (!res.ok) {
+              setErr(res.error);
+              return;
+            }
+            const blob = new Blob([res.csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = res.filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            setMsg(`Exported ${res.count} click${res.count === 1 ? "" : "s"}.`);
+          } catch {
+            setErr("Export failed. Please try again.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <label className="flex flex-col gap-1 text-xs font-semibold uppercase text-muted-foreground">
+          Start date
+          <input
+            type="date"
+            value={startDate}
+            max={endDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-background px-3 text-sm normal-case text-foreground"
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs font-semibold uppercase text-muted-foreground">
+          End date
+          <input
+            type="date"
+            value={endDate}
+            min={startDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-background px-3 text-sm normal-case text-foreground"
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs font-semibold uppercase text-muted-foreground">
+          Retailer
+          <select
+            value={retailer}
+            onChange={(e) => setRetailer(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-background px-3 text-sm normal-case text-foreground"
+          >
+            <option value="">All retailers</option>
+            {retailers.map((r) => (
+              <option key={r.slug} value={r.name}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="flex items-end">
+          <button
+            type="submit"
+            disabled={busy}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-gradient-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+            {busy ? "Exporting…" : "Export CSV"}
+          </button>
+        </div>
+      </form>
+      {msg && <p className="mt-3 text-xs text-success">{msg}</p>}
+      {err && <p className="mt-3 text-xs text-red-500">{err}</p>}
+    </Panel>
+  );
+}
