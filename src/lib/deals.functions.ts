@@ -121,14 +121,14 @@ async function sendWelcomeEmail(email: string) {
     console.warn("[sendWelcomeEmail] LOVABLE_API_KEY not set; skipping");
     return;
   }
-  const [{ renderAsync }, React, { sendLovableEmail }, { template }] = await Promise.all([
+  const [{ render }, React, { sendLovableEmail }, { template }] = await Promise.all([
     import("@react-email/components"),
     import("react"),
     import("@lovable.dev/email-js"),
     import("./email-templates/welcome"),
   ]);
   const element = React.createElement(template.component, template.previewData ?? {});
-  const html = await renderAsync(element);
+  const html = await render(element);
   const text = `Welcome to Wallet Wins!\n\nThanks for subscribing. Browse today's top deals at https://walletwins.shop/deals`;
   const subject =
     typeof template.subject === "function" ? template.subject({}) : template.subject;
