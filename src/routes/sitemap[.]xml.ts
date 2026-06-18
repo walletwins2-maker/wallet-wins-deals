@@ -20,7 +20,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/deals",
           ...CATEGORIES.map((c) => `/category/${c.slug}`),
           ...RETAILERS.map((r) => `/retailer/${r.slug}`),
-          ...deals.map((d) => `/deal/${d.id}`),
+          ...deals.map((d) => `/deal/${(d as { slug?: string }).slug ?? (d as { id: string }).id}`),
         ];
         const xml = [
           `<?xml version="1.0" encoding="UTF-8"?>`,
