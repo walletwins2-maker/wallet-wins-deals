@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as GuidesLiquidationStoresRouteImport } from './routes/guides.liquidation-stores'
 import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
+import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazon-bin-stores'
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
@@ -60,6 +61,11 @@ const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
   path: '/guides/costco-coupon-book',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesAmazonBinStoresRoute = GuidesAmazonBinStoresRouteImport.update({
+  id: '/guides/amazon-bin-stores',
+  path: '/guides/amazon-bin-stores',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealSlugRoute = DealSlugRouteImport.update({
   id: '/deal/$slug',
   path: '/deal/$slug',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/guides/amazon-bin-stores'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/guides/amazon-bin-stores'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/guides/amazon-bin-stores'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
+  GuidesAmazonBinStoresRoute: typeof GuidesAmazonBinStoresRoute
   GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
   GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesCostcoCouponBookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/amazon-bin-stores': {
+      id: '/guides/amazon-bin-stores'
+      path: '/guides/amazon-bin-stores'
+      fullPath: '/guides/amazon-bin-stores'
+      preLoaderRoute: typeof GuidesAmazonBinStoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deal/$slug': {
       id: '/deal/$slug'
       path: '/deal/$slug'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
+  GuidesAmazonBinStoresRoute: GuidesAmazonBinStoresRoute,
   GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
   GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
   RetailerSlugRoute: RetailerSlugRoute,
