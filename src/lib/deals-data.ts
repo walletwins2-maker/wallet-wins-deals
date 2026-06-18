@@ -386,7 +386,7 @@ const PLACEHOLDER_IMG =
   "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=900&q=80";
 
 export function mapRawDeals(rows: RawDeal[]): Deal[] {
-  return rows
+  const mapped = rows
     .filter((r) => r.product_name && r.product_url)
     .map((r): Deal => {
       const price = asNumber(r.price);
@@ -415,6 +415,22 @@ export function mapRawDeals(rows: RawDeal[]): Deal[] {
         status: asStatus(r.status),
       };
     });
+
+  // Overlay duplicates: if the same product appears more than once (same
+  // fingerprint, or same product_url as a fallback), keep only the newest
+  // record. Server returns rows ordered by created_at desc, so the first
+  // occurrence we see is the freshest one.
+  const seen = new Set<string>();
+  const deduped: Deal[] = [];
+  for (const d of mapped) {
+    const key = (d.product_fingerprint && d.product_fingerprint.trim())
+      ? `fp:${d.product_fingerprint}`
+      : `url:${d.product_url}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(d);
+  }
+  return deduped;
 }
 
 /* ---------- helpers operating on a deals array ---------- */
