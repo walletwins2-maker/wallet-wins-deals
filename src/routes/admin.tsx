@@ -242,7 +242,7 @@ function AdminDashboard() {
 
   const byRetailer = topRetailers(deals, 50);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const todayIso = new Date().toISOString().slice(0, 10);
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
@@ -353,7 +353,7 @@ function AdminDashboard() {
 
       <ExportClicksPanel
         defaultStart={sevenDaysAgo}
-        defaultEnd={today}
+        defaultEnd={todayIso}
         retailers={byRetailer.filter((r) => r.count > 0)}
         onExport={exportClicks}
       />
