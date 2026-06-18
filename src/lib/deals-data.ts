@@ -79,7 +79,7 @@ const RETAILER_CATEGORY: Record<string, string> = {
   gap: "fashion", "old-navy": "fashion", "banana-republic": "fashion",
   nordstrom: "fashion", "nordstrom-rack": "fashion", macys: "fashion", kohls: "fashion",
   uniqlo: "fashion", zara: "fashion", "h-and-m": "fashion", asos: "fashion",
-  shein: "fashion", lululemon: "fashion", "amanda-hair": "beauty",
+  shein: "fashion", lululemon: "fashion", "frank-eileen": "fashion", "frank-and-eileen": "fashion", "amanda-hair": "beauty",
   // beauty
   sephora: "beauty", ulta: "beauty",
   // home / hardware
