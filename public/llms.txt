@@ -1,0 +1,24 @@
+# Wallet Wins
+
+> Daily-updated deals, discounts, and price drops from hundreds of trusted retailers.
+
+Wallet Wins surfaces the best active sales across electronics, home, kitchen, fashion, beauty, fitness, and more. Each deal links to the retailer with the current price, discount, and a deal score.
+
+## Pages
+
+- [Home](/): Featured deals, trending retailers, and live categories.
+- [All Deals](/deals): Browse and filter every active deal by retailer, category, price, and discount.
+- [Electronics deals](/category/electronics): Active electronics deals and price drops.
+- [Home deals](/category/home): Active home deals and price drops.
+- [Kitchen deals](/category/kitchen): Active kitchen deals and price drops.
+- [Fashion deals](/category/fashion): Active fashion deals and price drops.
+- [Beauty deals](/category/beauty): Active beauty deals and price drops.
+- [Fitness deals](/category/fitness): Active fitness deals and price drops.
+
+## Guides
+
+- [Costco Coupon Book Guide](/guides/costco-coupon-book): How the Costco member-savings mailer works and how to stack it with current deals.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Machine-readable list of public URLs.
