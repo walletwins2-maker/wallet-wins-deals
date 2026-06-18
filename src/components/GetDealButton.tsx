@@ -1,20 +1,22 @@
 import { ExternalLink } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import type { Deal } from "@/lib/deals-data";
+import { trackClickServer } from "@/lib/deals.functions";
 
 export function GetDealButton({ deal, large = false }: { deal: Deal; large?: boolean }) {
+  const trackClick = useServerFn(trackClickServer);
   const onClick = () => {
-    // Affiliate click tracking (stubbed — wire to Supabase affiliate_clicks once connected)
+    // Fire-and-forget — never block the user from reaching the retailer.
     try {
-      const event = {
-        product_fingerprint: deal.id,
-        retailer: deal.retailer,
-        clicked_at: new Date().toISOString(),
-        referrer: typeof document !== "undefined" ? document.referrer : "",
-      };
-      const key = "ww_pending_clicks";
-      const prev = JSON.parse(localStorage.getItem(key) ?? "[]");
-      prev.push(event);
-      localStorage.setItem(key, JSON.stringify(prev));
+      void trackClick({
+        data: {
+          deal_id: deal.id,
+          product_fingerprint: deal.product_fingerprint,
+          retailer: deal.retailer,
+          source_page: typeof window !== "undefined" ? window.location.pathname : undefined,
+          referrer: typeof document !== "undefined" ? document.referrer : undefined,
+        },
+      });
     } catch {
       /* ignore */
     }

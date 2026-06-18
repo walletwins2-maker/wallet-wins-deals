@@ -2,6 +2,7 @@ export type DealStatus = "pending" | "queued" | "posted" | "expired";
 
 export interface Deal {
   id: string;
+  slug: string;
   product_name: string;
   image_url: string;
   product_url: string;
@@ -19,6 +20,7 @@ export interface Deal {
 
 export interface RawDeal {
   id: number | string;
+  slug?: string | null;
   product_name: string | null;
   image_url: string | null;
   product_url: string | null;
@@ -147,6 +149,7 @@ export function mapRawDeals(rows: RawDeal[]): Deal[] {
       const name = r.product_name ?? "Untitled deal";
       return {
         id: String(r.id),
+        slug: r.slug ?? String(r.id),
         product_name: name,
         image_url: r.image_url ?? PLACEHOLDER_IMG,
         product_url: r.product_url ?? "#",

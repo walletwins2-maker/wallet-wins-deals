@@ -13,10 +13,11 @@ import {
 } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
-export const Route = createFileRoute("/deal/$id")({
+export const Route = createFileRoute("/deal/$slug")({
   loader: async ({ params, context }) => {
     const deals = await context.queryClient.ensureQueryData(dealsQueryOptions);
-    const deal = dealById(deals, params.id);
+    const deal =
+      deals.find((d) => d.slug === params.slug) ?? dealById(deals, params.slug);
     if (!deal) throw notFound();
     return { deal };
   },
@@ -33,11 +34,11 @@ export const Route = createFileRoute("/deal/$id")({
         { property: "og:description", content: desc },
         { property: "og:image", content: deal.image_url },
         { property: "og:type", content: "product" },
-        { property: "og:url", content: `/deal/${deal.id}` },
+        { property: "og:url", content: `/deal/${deal.slug}` },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: deal.image_url },
       ],
-      links: [{ rel: "canonical", href: `/deal/${deal.id}` }],
+      links: [{ rel: "canonical", href: `/deal/${deal.slug}` }],
       scripts: [
         {
           type: "application/ld+json",

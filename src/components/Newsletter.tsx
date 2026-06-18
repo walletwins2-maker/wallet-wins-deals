@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { subscribeNewsletterServer } from "@/lib/deals.functions";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const subscribe = useServerFn(subscribeNewsletterServer);
 
   return (
     <section className="mx-auto mt-16 max-w-5xl rounded-3xl bg-gradient-hero px-6 py-12 text-center text-white shadow-elegant sm:px-12">
@@ -16,10 +21,25 @@ export function Newsletter() {
       </p>
       <form
         className="mx-auto mt-6 flex max-w-md flex-col gap-2 sm:flex-row"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          if (!email.includes("@")) return;
-          setDone(true);
+          if (busy) return;
+          setError(null);
+          setBusy(true);
+          try {
+            const res = await subscribe({
+              data: {
+                email,
+                source_page: typeof window !== "undefined" ? window.location.pathname : undefined,
+              },
+            });
+            if (res.ok) setDone(true);
+            else setError(res.error ?? "Something went wrong.");
+          } catch (err) {
+            setError(err instanceof Error ? err.message : "Something went wrong.");
+          } finally {
+            setBusy(false);
+          }
         }}
       >
         <input
@@ -32,11 +52,13 @@ export function Newsletter() {
         />
         <button
           type="submit"
+          disabled={busy || done}
           className="h-12 rounded-full bg-gradient-primary px-6 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
         >
-          {done ? "Subscribed!" : "Subscribe"}
+          {done ? "Subscribed!" : busy ? "..." : "Subscribe"}
         </button>
       </form>
+      {error && <p className="mt-3 text-xs text-red-300">{error}</p>}
     </section>
   );
 }
