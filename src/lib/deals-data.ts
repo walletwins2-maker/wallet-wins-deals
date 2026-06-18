@@ -43,13 +43,41 @@ export const CATEGORIES = [
   { slug: "outdoor", name: "Outdoor", emoji: "🏕️" },
   { slug: "toys", name: "Toys", emoji: "🧸" },
   { slug: "fitness", name: "Fitness", emoji: "💪" },
+  { slug: "pets", name: "Pets", emoji: "🐾" },
+  { slug: "baby", name: "Baby & Kids", emoji: "🍼" },
+  { slug: "health", name: "Health", emoji: "💊" },
+  { slug: "grocery", name: "Grocery", emoji: "🛒" },
+  { slug: "automotive", name: "Automotive", emoji: "🚗" },
+  { slug: "garden", name: "Garden", emoji: "🌿" },
+  { slug: "office", name: "Office & School", emoji: "🖇️" },
+  { slug: "jewelry", name: "Jewelry", emoji: "💍" },
+  { slug: "books", name: "Books & Media", emoji: "📚" },
+  { slug: "music", name: "Music & Instruments", emoji: "🎸" },
+  { slug: "travel", name: "Travel & Luggage", emoji: "🧳" },
+  { slug: "art", name: "Arts & Crafts", emoji: "🎨" },
   { slug: "other", name: "Other", emoji: "🛍️" },
 ] as const;
 
 const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
-  ["electronics", ["phone", "laptop", "tablet", "tv", "headphone", "earbud", "camera", "computer", "monitor", "speaker", "console", "watch", "airpod", "ipad", "iphone", "macbook", "kindle", "router"]],
-  ["kitchen", ["kitchen", "blender", "mixer", "fryer", "oven", "cookware", "pan", "pot", "knife", "coffee", "espresso", "toaster", "instant pot", "vitamix", "ninja"]],
-  ["beauty", ["serum", "shampoo", "conditioner", "lotion", "makeup", "skincare", "cream", "perfume", "cosmetic", "lipstick", "mascara", "fragrance", "wig", "lace front", "bundle deal", "hair extension", "weave"]],
+  ["electronics", [
+    "phone", "smartphone", "laptop", "tablet", "tv", "television", "headphone", "headphones", "earbud", "earbuds",
+    "camera", "gopro", "drone", "computer", "pc", "desktop", "monitor", "speaker", "soundbar", "subwoofer",
+    "console", "playstation", "ps5", "xbox", "nintendo", "switch", "airpod", "airpods", "ipad", "iphone", "macbook",
+    "kindle", "router", "modem", "ssd", "hdd", "gpu", "rtx", "keyboard", "mouse", "webcam", "charger", "smartwatch",
+    "fitbit", "garmin", "alexa", "echo dot", "ring doorbell", "projector", "printer",
+  ]],
+  ["kitchen", [
+    "kitchen", "blender", "mixer", "stand mixer", "air fryer", "fryer", "oven", "microwave", "cookware", "bakeware",
+    "skillet", "saucepan", "knife", "knives", "cutting board", "coffee maker", "espresso", "french press",
+    "toaster", "kettle", "instant pot", "vitamix", "kitchenaid", "dutch oven", "cast iron", "ninja foodi",
+    "dishware", "flatware", "silverware", "mug", "drinkware",
+  ]],
+  ["beauty", [
+    "serum", "shampoo", "conditioner", "lotion", "makeup", "skincare", "moisturizer", "cleanser", "toner",
+    "cream", "perfume", "cologne", "cosmetic", "lipstick", "lip gloss", "mascara", "eyeliner", "foundation",
+    "concealer", "blush", "eyeshadow", "fragrance", "wig", "lace front", "hair extension", "weave", "nail polish",
+    "nail kit", "hair dryer", "curling iron", "flat iron", "razor", "shaver", "epilator",
+  ]],
   ["fashion", [
     // tops
     "shirt", "t-shirt", "tee", "tshirt", "polo", "blouse", "tank", "tank top", "camisole", "cami", "sweater", "cardigan", "pullover", "sweatshirt", "hoodie", "vest",
@@ -66,10 +94,80 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     // generic apparel terms
     "apparel", "clothing", "outfit",
   ]],
-  ["outdoor", ["tent", "camping", "hiking", "backpack", "tumbler", "cooler", "grill", "yeti", "stanley", "fishing"]],
-  ["toys", ["lego", "toy", "doll", "puzzle", "game", "playset", "plush", "nerf", "hot wheel"]],
-  ["fitness", ["dumbbell", "yoga", "treadmill", "bike", "fitness", "massage", "peloton", "resistance"]],
-  ["home", ["vacuum", "robot", "mattress", "bedding", "rug", "lamp", "furniture", "sofa", "chair", "decor", "drill", "tool", "dewalt", "broom"]],
+  ["outdoor", [
+    "tent", "camping", "hiking", "backpack", "tumbler", "cooler", "grill", "yeti", "stanley", "fishing",
+    "kayak", "paddle", "hammock", "sleeping bag", "trekking", "headlamp", "lantern", "binocular",
+  ]],
+  ["toys", [
+    "lego", "toy", "toys", "doll", "puzzle", "board game", "playset", "plush", "stuffed animal", "nerf",
+    "hot wheel", "hot wheels", "barbie", "rc car", "action figure", "building block",
+  ]],
+  ["fitness", [
+    "dumbbell", "kettlebell", "yoga", "treadmill", "elliptical", "rowing machine", "exercise bike",
+    "fitness", "workout", "massage gun", "foam roller", "peloton", "resistance band", "pull up bar",
+    "weight bench", "barbell",
+  ]],
+  ["home", [
+    "vacuum", "robot vacuum", "mattress", "bedding", "comforter", "sheet set", "duvet", "pillow",
+    "rug", "lamp", "ceiling fan", "air purifier", "humidifier", "dehumidifier", "furniture", "sofa",
+    "couch", "sectional", "chair", "recliner", "decor", "curtain", "blind", "drill", "power tool",
+    "dewalt", "milwaukee", "broom", "mop", "storage bin", "shelving",
+  ]],
+  ["pets", [
+    "dog", "puppy", "cat", "kitten", "pet", "leash", "collar", "harness", "kibble", "dog food",
+    "cat food", "litter box", "litter", "aquarium", "fish tank", "chew toy", "scratching post",
+    "crate", "kennel",
+  ]],
+  ["baby", [
+    "baby", "infant", "toddler", "diaper", "diapers", "stroller", "car seat", "crib", "bassinet",
+    "pacifier", "onesie", "bib", "high chair", "playpen", "formula", "breast pump", "nursing",
+  ]],
+  ["health", [
+    "vitamin", "vitamins", "supplement", "protein powder", "collagen", "multivitamin", "probiotic",
+    "first aid", "thermometer", "blood pressure", "pulse oximeter", "cpap", "heating pad",
+    "compression sock", "wellness",
+  ]],
+  ["grocery", [
+    "snack", "snacks", "cereal", "granola", "chocolate", "candy", "chips", "popcorn", "beverage",
+    "soda", "sparkling water", "tea", "ground coffee", "coffee pod", "k-cup", "olive oil",
+    "pasta", "rice", "seasoning", "spice", "sauce", "jerky", "protein bar",
+  ]],
+  ["automotive", [
+    "car", "auto", "automotive", "tire", "tires", "motor oil", "wiper", "wiper blade", "dash cam",
+    "jump starter", "car charger", "car mount", "car cover", "car seat cover", "obd", "garage",
+  ]],
+  ["garden", [
+    "garden", "planter", "raised bed", "soil", "mulch", "fertilizer", "lawn mower", "leaf blower",
+    "string trimmer", "hedge trimmer", "seed", "seeds", "patio", "gazebo", "hose", "sprinkler",
+    "bird feeder", "outdoor furniture",
+  ]],
+  ["office", [
+    "office", "desk", "office chair", "standing desk", "monitor stand", "filing", "stationery",
+    "notebook", "binder", "planner", "stapler", "shredder", "school supply", "school supplies",
+    "backpack", "lunch box", "calculator",
+  ]],
+  ["jewelry", [
+    "necklace", "bracelet", "earring", "earrings", "ring", "pendant", "diamond", "gold chain",
+    "silver chain", "watch", "rolex", "cartier", "engagement ring", "wedding band",
+  ]],
+  ["books", [
+    "book", "novel", "cookbook", "textbook", "audiobook", "kindle book", "ebook", "magazine",
+    "comic", "manga", "dvd", "blu-ray", "vinyl record",
+  ]],
+  ["music", [
+    "guitar", "acoustic guitar", "electric guitar", "bass guitar", "ukulele", "keyboard piano",
+    "digital piano", "drum kit", "drum set", "microphone", "midi controller", "audio interface",
+    "studio monitor", "synthesizer", "violin",
+  ]],
+  ["travel", [
+    "luggage", "suitcase", "carry-on", "carry on", "travel bag", "duffel", "garment bag",
+    "packing cube", "travel pillow", "passport holder",
+  ]],
+  ["art", [
+    "art", "craft", "crafts", "paint set", "acrylic paint", "watercolor", "sketchbook",
+    "drawing pad", "colored pencil", "marker set", "easel", "canvas", "sewing machine", "knitting",
+    "crochet", "yarn", "embroidery", "scrapbook",
+  ]],
 ];
 
 // Retailer-slug → default category. Only used when the title keywords don't match.
@@ -79,17 +177,43 @@ const RETAILER_CATEGORY: Record<string, string> = {
   gap: "fashion", "old-navy": "fashion", "banana-republic": "fashion",
   nordstrom: "fashion", "nordstrom-rack": "fashion", macys: "fashion", kohls: "fashion",
   uniqlo: "fashion", zara: "fashion", "h-and-m": "fashion", asos: "fashion",
-  shein: "fashion", lululemon: "fashion", "frank-eileen": "fashion", "frank-and-eileen": "fashion", "amanda-hair": "beauty",
+  shein: "fashion", lululemon: "fashion", "frank-eileen": "fashion", "frank-and-eileen": "fashion",
+  zapaka: "fashion", "free-people": "fashion", anthropologie: "fashion", "j-crew": "fashion",
+  madewell: "fashion", everlane: "fashion", reformation: "fashion", "tommy-hilfiger": "fashion",
+  "ralph-lauren": "fashion", "calvin-klein": "fashion", levis: "fashion",
   // beauty
-  sephora: "beauty", ulta: "beauty",
+  sephora: "beauty", ulta: "beauty", glossier: "beauty", "amanda-hair": "beauty",
+  "the-ordinary": "beauty", elf: "beauty", "kiehls": "beauty",
   // home / hardware
   "home-depot": "home", lowes: "home", ikea: "home", wayfair: "home", "west-elm": "home",
+  "pottery-barn": "home", "crate-and-barrel": "home", "cb2": "home", "ace-hardware": "home",
   // electronics
   "best-buy": "electronics", newegg: "electronics", bhphotovideo: "electronics", apple: "electronics",
+  microcenter: "electronics", samsung: "electronics", lg: "electronics", sony: "electronics",
+  bose: "electronics",
   // outdoor
   rei: "outdoor", "dicks-sporting-goods": "outdoor", "bass-pro-shops": "outdoor", patagonia: "outdoor",
+  cabelas: "outdoor", "the-north-face": "outdoor", "columbia-sportswear": "outdoor",
   // toys
-  "lego-shop": "toys",
+  "lego-shop": "toys", "toys-r-us": "toys", "build-a-bear": "toys",
+  // pets
+  chewy: "pets", petco: "pets", petsmart: "pets",
+  // baby
+  "buy-buy-baby": "baby", carters: "baby", "the-honest-company": "baby",
+  // health
+  gnc: "health", "vitamin-shoppe": "health", iherb: "health",
+  // grocery
+  "trader-joes": "grocery", "whole-foods": "grocery", instacart: "grocery", thrive: "grocery",
+  // automotive
+  autozone: "automotive", "advance-auto-parts": "automotive", "oreilly-auto-parts": "automotive",
+  // jewelry
+  "blue-nile": "jewelry", "james-allen": "jewelry", pandora: "jewelry", tiffany: "jewelry",
+  // books
+  "barnes-and-noble": "books", "books-a-million": "books",
+  // music
+  "guitar-center": "music", "sweetwater": "music", "sam-ash": "music",
+  // travel
+  away: "travel", samsonite: "travel", tumi: "travel",
 };
 
 // Use word-boundary matching so "shirt" doesn't match "t-shirt"-less strings
