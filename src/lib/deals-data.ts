@@ -416,18 +416,27 @@ export function mapRawDeals(rows: RawDeal[]): Deal[] {
       };
     });
 
-  // Overlay duplicates: if the same product appears more than once (same
-  // fingerprint, or same product_url as a fallback), keep only the newest
-  // record. Server returns rows ordered by created_at desc, so the first
+  // Overlay duplicates: if the same product appears more than once, keep only
+  // the newest record. Rows are ordered by created_at desc, so the first
   // occurrence we see is the freshest one.
+  //
+  // We only collapse when we have a STRONG identity key:
+  //   - a non-empty product_fingerprint, OR
+  //   - a non-empty, fully-qualified product_url
+  // Otherwise we keep the row (a blank/shared fingerprint must NOT swallow
+  // unrelated deals).
   const seen = new Set<string>();
   const deduped: Deal[] = [];
   for (const d of mapped) {
-    const key = (d.product_fingerprint && d.product_fingerprint.trim())
-      ? `fp:${d.product_fingerprint}`
-      : `url:${d.product_url}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
+    const fp = d.product_fingerprint?.trim();
+    const url = d.product_url?.trim();
+    let key: string | null = null;
+    if (fp && fp.length > 4 && fp !== d.id) key = `fp:${fp}`;
+    else if (url && /^https?:\/\//i.test(url)) key = `url:${url}`;
+    if (key) {
+      if (seen.has(key)) continue;
+      seen.add(key);
+    }
     deduped.push(d);
   }
   return deduped;
