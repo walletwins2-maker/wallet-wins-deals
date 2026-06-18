@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 import { DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
-import { CATEGORIES, activeDeals, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
+import { liveCategories, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
 export const Route = createFileRoute("/")({
@@ -32,8 +32,7 @@ function Index() {
   const featured = topDeals(deals, 8);
   const drops = recentDrops(deals, 8);
   const retailers = topRetailers(deals, 8);
-  const liveCategorySlugs = new Set(activeDeals(deals).map((d) => d.category));
-  const liveCategories = CATEGORIES.filter((c) => liveCategorySlugs.has(c.slug));
+  const categories = liveCategories(deals);
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
@@ -94,11 +93,11 @@ function Index() {
       </div>
 
       {/* Categories */}
-      {liveCategories.length > 0 && (
+      {categories.length > 0 && (
         <>
           <SectionHeader title="Popular Categories" />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {liveCategories.map((c) => (
+            {categories.map((c) => (
           <Link
             key={c.slug}
             to="/category/$slug"
@@ -109,7 +108,12 @@ function Index() {
               {c.emoji}
             </span>
             <div>
-              <p className="font-semibold text-foreground group-hover:text-primary">{c.name}</p>
+              <p className="font-semibold text-foreground group-hover:text-primary">
+                {c.name}{" "}
+                <span className="ml-1 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
+                  {c.count}
+                </span>
+              </p>
               <p className="text-xs text-muted-foreground">Shop now</p>
             </div>
           </Link>
