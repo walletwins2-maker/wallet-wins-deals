@@ -18,6 +18,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const paths = [
           "/",
           "/deals",
+          "/guides/costco-coupon-book",
           ...CATEGORIES.map((c) => `/category/${c.slug}`),
           ...RETAILERS.map((r) => `/retailer/${r.slug}`),
           ...deals.map((d) => `/deal/${(d as { slug?: string }).slug ?? (d as { id: string }).id}`),
