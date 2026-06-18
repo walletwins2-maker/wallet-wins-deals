@@ -35,6 +35,39 @@ export const Route = createFileRoute("/guides/costco-coupon-book")({
           mainEntityOfPage: URL_PATH,
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "Do I need to clip or scan the coupons?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No. Discounts come off automatically at checkout for any active member.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can I price-adjust an item I bought before the book started?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes — within 30 days of purchase, bring your receipt to the membership desk for a refund of the difference.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Do the coupons work on Costco.com?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Most do, but pricing and availability can differ from your local warehouse. The book labels each offer as in-warehouse, online, or both.",
+              },
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: CostcoCouponBookGuide,
