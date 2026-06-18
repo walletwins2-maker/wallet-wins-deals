@@ -13,6 +13,7 @@ export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
       { title: "Search Deals — Wallet Wins" },
+      { name: "description", content: "Search active deals, discounts, and price drops across hundreds of retailers on Wallet Wins." },
       { name: "robots", content: "noindex" },
     ],
   }),

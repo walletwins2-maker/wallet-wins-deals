@@ -10,9 +10,9 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
-      { title: "Wallet Wins — The Best Deals. Updated Daily." },
+      { title: "Wallet Wins — Daily Deals & Price Drops" },
       { name: "description", content: "Save more every day. Discover the best deals, discounts, and price drops from hundreds of trusted retailers." },
-      { property: "og:title", content: "Wallet Wins — The Best Deals. Updated Daily." },
+      { property: "og:title", content: "Wallet Wins — Daily Deals & Price Drops" },
       { property: "og:description", content: "Save more every day. Discover the best deals, discounts, and price drops from hundreds of trusted retailers." },
       { property: "og:url", content: "/" },
     ],

@@ -24,7 +24,13 @@ export const Route = createFileRoute("/deal/$slug")({
   head: ({ loaderData }) => {
     const deal = loaderData?.deal;
     if (!deal) return { meta: [{ title: "Deal — Wallet Wins" }] };
-    const title = `${deal.product_name} — ${deal.discount}% off | Wallet Wins`;
+    const suffix = ` — ${deal.discount}% off | Wallet Wins`;
+    const maxName = Math.max(20, 60 - suffix.length);
+    const shortName =
+      deal.product_name.length > maxName
+        ? `${deal.product_name.slice(0, maxName - 1).trimEnd()}…`
+        : deal.product_name;
+    const title = `${shortName}${suffix}`;
     const desc = `Save ${formatPrice(deal.original_price - deal.price)} on ${deal.product_name} from ${deal.retailer_name}. Now ${formatPrice(deal.price)}.`;
     return {
       meta: [
