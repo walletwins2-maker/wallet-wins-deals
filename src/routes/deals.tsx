@@ -45,10 +45,9 @@ function DealsPage() {
   const { data: deals } = useSuspenseQuery(dealsQueryOptions);
   const { q, retailer, category, maxPrice, minDiscount, sort } = Route.useSearch();
   const navigate = useNavigate({ from: "/deals" });
-  const update = <K extends keyof z.infer<typeof searchSchema>>(
-    key: K,
-    value: z.infer<typeof searchSchema>[K],
-  ) => navigate({ search: (prev) => ({ ...prev, [key]: value }) });
+  type SearchState = z.infer<typeof searchSchema>;
+  const update = <K extends keyof SearchState>(key: K, value: SearchState[K]) =>
+    navigate({ search: (prev: SearchState) => ({ ...prev, [key]: value }) });
 
   const RETAILERS = useMemo(() => topRetailers(deals, 20), [deals]);
 
