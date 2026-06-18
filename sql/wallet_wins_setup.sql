@@ -174,9 +174,11 @@ create policy "Authenticated can read clicks"
 -- ---------------------------------------------------------------------
 -- 4. newsletter_subscribers
 -- ---------------------------------------------------------------------
+-- Store email as plain text and enforce case-insensitive uniqueness via a
+-- functional index on lower(email). Avoids the citext extension entirely.
 create table if not exists public.newsletter_subscribers (
   id            uuid primary key default gen_random_uuid(),
-  email         citext unique,         -- requires citext; falls back below if missing
+  email         text not null,
   source_page   text,
   referrer      text,
   user_agent    text,
@@ -185,9 +187,8 @@ create table if not exists public.newsletter_subscribers (
   created_at    timestamptz not null default now()
 );
 
--- If citext extension isn't available, swap email type to text + lower-case unique.
--- (Run this block only if the above failed because citext is missing.)
--- create extension if not exists citext;
+create unique index if not exists newsletter_subscribers_email_lower_uidx
+  on public.newsletter_subscribers (lower(email));
 
 create index if not exists newsletter_subscribers_created_idx
   on public.newsletter_subscribers (created_at desc);
