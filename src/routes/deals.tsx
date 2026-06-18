@@ -40,7 +40,7 @@ export const Route = createFileRoute("/deals")({
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Couldn't load deals</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">Something went wrong. Please try again.</p>
     </div>
   ),
 });
