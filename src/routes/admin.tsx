@@ -1,5 +1,7 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Activity, Package, Store, Tag } from "lucide-react";
 import {
@@ -11,33 +13,60 @@ import {
 } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
-// Server-side token gate. The dashboard is operator-only; access requires
-// `?token=<ADMIN_DASHBOARD_TOKEN>` matching the server secret. Without a
-// configured secret the route is unavailable (returns 404).
-const verifyAdminToken = createServerFn({ method: "GET" })
-  .inputValidator((d: { token?: string }) => d)
+// Operator-only dashboard. The secret is submitted via POST (never as a URL
+// query parameter, which would leak into logs / browser history / Referer
+// headers) and stored server-side in an HttpOnly cookie for subsequent visits.
+const ADMIN_COOKIE = "ww_admin_session";
+
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+// Reads the HttpOnly session cookie and reports whether the caller is
+// authorized. Safe to call from a public loader: returns { ok: false } when
+// the secret is unset or the cookie is missing/wrong — never throws on
+// unauthenticated requests.
+const checkAdminSession = createServerFn({ method: "GET" }).handler(async () => {
+  const expected = process.env.ADMIN_DASHBOARD_TOKEN;
+  if (!expected) return { ok: false as const };
+  const cookie = getCookie(ADMIN_COOKIE);
+  if (!cookie) return { ok: false as const };
+  return { ok: constantTimeEqual(cookie, expected) };
+});
+
+const loginAdmin = createServerFn({ method: "POST" })
+  .inputValidator((d: { token: string }) => d)
   .handler(async ({ data }) => {
     const expected = process.env.ADMIN_DASHBOARD_TOKEN;
     if (!expected) return { ok: false as const };
     const provided = (data.token ?? "").trim();
-    if (!provided || provided.length !== expected.length) return { ok: false as const };
-    // Constant-time-ish compare
-    let mismatch = 0;
-    for (let i = 0; i < expected.length; i++) {
-      mismatch |= expected.charCodeAt(i) ^ provided.charCodeAt(i);
-    }
-    return { ok: mismatch === 0 };
+    if (!constantTimeEqual(provided, expected)) return { ok: false as const };
+    setCookie(ADMIN_COOKIE, expected, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 8, // 8h operator session
+    });
+    return { ok: true as const };
   });
 
+const logoutAdmin = createServerFn({ method: "POST" }).handler(async () => {
+  deleteCookie(ADMIN_COOKIE, { path: "/" });
+  return { ok: true as const };
+});
+
 export const Route = createFileRoute("/admin")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    token: typeof search.token === "string" ? search.token : undefined,
-  }),
-  loaderDeps: ({ search }) => ({ token: search.token }),
-  loader: async ({ context, deps }) => {
-    const result = await verifyAdminToken({ data: { token: deps.token } });
-    if (!result.ok) throw notFound();
-    return context.queryClient.ensureQueryData(dealsQueryOptions);
+  loader: async ({ context }) => {
+    const session = await checkAdminSession();
+    if (!session.ok) return { authed: false as const };
+    await context.queryClient.ensureQueryData(dealsQueryOptions);
+    return { authed: true as const };
   },
   head: () => ({
     meta: [
@@ -47,11 +76,6 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   component: AdminPage,
-  notFoundComponent: () => (
-    <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-      <h1 className="text-2xl font-bold">Not found</h1>
-    </div>
-  ),
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Couldn't load dashboard</h1>
