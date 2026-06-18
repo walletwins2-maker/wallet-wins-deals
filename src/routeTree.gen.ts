@@ -15,6 +15,7 @@ import { Route as DealsRouteImport } from './routes/deals'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
+import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
@@ -48,6 +49,11 @@ const RetailerSlugRoute = RetailerSlugRouteImport.update({
   path: '/retailer/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
+  id: '/guides/costco-coupon-book',
+  path: '/guides/costco-coupon-book',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealSlugRoute = DealSlugRouteImport.update({
   id: '/deal/$slug',
   path: '/deal/$slug',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/guides/costco-coupon-book'
     | '/retailer/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/guides/costco-coupon-book'
     | '/retailer/$slug'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/guides/costco-coupon-book'
     | '/retailer/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
+  GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
 }
 
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/costco-coupon-book': {
+      id: '/guides/costco-coupon-book'
+      path: '/guides/costco-coupon-book'
+      fullPath: '/guides/costco-coupon-book'
+      preLoaderRoute: typeof GuidesCostcoCouponBookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deal/$slug': {
       id: '/deal/$slug'
       path: '/deal/$slug'
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
+  GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
   RetailerSlugRoute: RetailerSlugRoute,
 }
 export const routeTree = rootRouteImport
