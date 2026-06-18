@@ -5,7 +5,7 @@ import { Search, X } from "lucide-react";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { DealGrid } from "@/components/DealCard";
-import { CATEGORIES, activeDeals, topRetailers } from "@/lib/deals-data";
+import { activeDeals, liveCategories, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
 const SORTS = ["best", "newest", "discount", "price"] as const;
@@ -60,6 +60,7 @@ function DealsPage() {
     });
 
   const RETAILERS = useMemo(() => topRetailers(deals, 20), [deals]);
+  const CATEGORY_OPTIONS = useMemo(() => liveCategories(deals), [deals]);
 
   const filtered = useMemo(() => {
     let list = activeDeals(deals);
@@ -158,9 +159,9 @@ function DealsPage() {
           className="h-10 rounded-full border border-input bg-background px-4 text-sm outline-none focus:border-primary"
         >
           <option value="all">All categories</option>
-          {CATEGORIES.map((c) => (
+          {CATEGORY_OPTIONS.map((c) => (
             <option key={c.slug} value={c.slug}>
-              {c.name}
+              {c.name} ({c.count})
             </option>
           ))}
         </select>

@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
-import { CATEGORIES, activeDeals, topRetailers } from "@/lib/deals-data";
+import { CATEGORIES, liveCategories, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
 
 export function Footer() {
@@ -12,12 +12,13 @@ export function Footer() {
   useEffect(() => setHydrated(true), []);
   const { data: deals = [] } = useQuery({ ...dealsQueryOptions, retry: false });
 
-  const liveCategorySlugs = new Set(activeDeals(deals).map((d) => d.category));
-  const liveCategories = CATEGORIES.filter((c) => liveCategorySlugs.has(c.slug)).slice(0, 6);
+  const liveCats = liveCategories(deals).slice(0, 6);
   const liveRetailers = topRetailers(deals, 6);
 
-  const showLive = hydrated && (liveCategories.length > 0 || liveRetailers.length > 0);
-  const categories = showLive && liveCategories.length ? liveCategories : CATEGORIES.slice(0, 6);
+  const showLive = hydrated && (liveCats.length > 0 || liveRetailers.length > 0);
+  const categories = showLive && liveCats.length
+    ? liveCats
+    : CATEGORIES.slice(0, 6).map((c) => ({ ...c, count: 0 }));
 
   return (
     <footer className="mt-20 border-t border-border bg-muted/40">
@@ -42,6 +43,9 @@ export function Footer() {
               <li key={c.slug}>
                 <Link to="/category/$slug" params={{ slug: c.slug }} className="hover:text-foreground">
                   {c.name}
+                  {showLive && c.count > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground/70">({c.count})</span>
+                  )}
                 </Link>
               </li>
             ))}

@@ -38,33 +38,121 @@ export const CATEGORIES = [
   { slug: "electronics", name: "Electronics", emoji: "📱" },
   { slug: "home", name: "Home", emoji: "🏠" },
   { slug: "kitchen", name: "Kitchen", emoji: "🍳" },
-  { slug: "beauty", name: "Beauty", emoji: "💄" },
   { slug: "fashion", name: "Fashion", emoji: "👗" },
-  { slug: "outdoor", name: "Outdoor", emoji: "🏕️" },
-  { slug: "toys", name: "Toys", emoji: "🧸" },
-  { slug: "fitness", name: "Fitness", emoji: "💪" },
-  { slug: "pets", name: "Pets", emoji: "🐾" },
-  { slug: "baby", name: "Baby & Kids", emoji: "🍼" },
+  { slug: "beauty", name: "Beauty", emoji: "💄" },
   { slug: "health", name: "Health", emoji: "💊" },
-  { slug: "grocery", name: "Grocery", emoji: "🛒" },
+  { slug: "fitness", name: "Fitness", emoji: "💪" },
+  { slug: "toys", name: "Toys", emoji: "🧸" },
+  { slug: "baby", name: "Baby", emoji: "🍼" },
+  { slug: "pets", name: "Pets", emoji: "🐾" },
+  { slug: "outdoor", name: "Outdoor", emoji: "🏕️" },
   { slug: "automotive", name: "Automotive", emoji: "🚗" },
-  { slug: "garden", name: "Garden", emoji: "🌿" },
-  { slug: "office", name: "Office & School", emoji: "🖇️" },
-  { slug: "jewelry", name: "Jewelry", emoji: "💍" },
-  { slug: "books", name: "Books & Media", emoji: "📚" },
-  { slug: "music", name: "Music & Instruments", emoji: "🎸" },
-  { slug: "travel", name: "Travel & Luggage", emoji: "🧳" },
-  { slug: "art", name: "Arts & Crafts", emoji: "🎨" },
+  { slug: "tools", name: "Tools", emoji: "🛠️" },
+  { slug: "travel", name: "Travel", emoji: "🧳" },
+  { slug: "office", name: "Office", emoji: "🖇️" },
+  { slug: "food-beverage", name: "Food & Beverage", emoji: "🛒" },
+  { slug: "gaming", name: "Gaming", emoji: "🎮" },
+  { slug: "seasonal", name: "Seasonal", emoji: "🎄" },
   { slug: "other", name: "Other", emoji: "🛍️" },
 ] as const;
+
+export type CategorySlug = (typeof CATEGORIES)[number]["slug"];
+const ALLOWED_CATEGORY_SLUGS = new Set<string>(CATEGORIES.map((c) => c.slug));
+
+// Normalize any incoming category-ish string (retailer feed, CJ/Impact taxonomy,
+// legacy slug, etc.) to an approved Wallet Wins category slug.
+const CATEGORY_ALIASES: Record<string, CategorySlug> = {
+  // legacy / removed slugs
+  grocery: "food-beverage",
+  "food-and-beverage": "food-beverage",
+  food: "food-beverage",
+  beverage: "food-beverage",
+  drinks: "food-beverage",
+  jewelry: "fashion",
+  jewellery: "fashion",
+  watches: "fashion",
+  shoes: "fashion",
+  clothing: "fashion",
+  apparel: "fashion",
+  accessories: "fashion",
+  garden: "home",
+  "lawn-and-garden": "home",
+  furniture: "home",
+  bedding: "home",
+  decor: "home",
+  storage: "home",
+  appliances: "home",
+  "power-tools": "tools",
+  hardware: "tools",
+  books: "other",
+  media: "other",
+  music: "other",
+  instruments: "other",
+  art: "other",
+  crafts: "other",
+  "arts-and-crafts": "other",
+  videogames: "gaming",
+  "video-games": "gaming",
+  console: "gaming",
+  consoles: "gaming",
+  holiday: "seasonal",
+  christmas: "seasonal",
+  halloween: "seasonal",
+  computers: "electronics",
+  laptops: "electronics",
+  "cell-phones": "electronics",
+  audio: "electronics",
+  tv: "electronics",
+  cookware: "kitchen",
+  "small-appliances": "kitchen",
+  "sports-and-outdoors": "outdoor",
+  sports: "outdoor",
+  camping: "outdoor",
+  hiking: "outdoor",
+  "pet-supplies": "pets",
+  "baby-and-kids": "baby",
+  kids: "baby",
+  skincare: "beauty",
+  makeup: "beauty",
+  fragrance: "beauty",
+  haircare: "beauty",
+  supplements: "health",
+  wellness: "health",
+  vitamins: "health",
+  exercise: "fitness",
+  workout: "fitness",
+  yoga: "fitness",
+  "car-and-truck": "automotive",
+  auto: "automotive",
+  luggage: "travel",
+  "school-supplies": "office",
+  stationery: "office",
+};
+
+export function normalizeCategory(raw: string | null | undefined): CategorySlug {
+  if (!raw) return "other";
+  const slug = slugifyCat(raw);
+  if (ALLOWED_CATEGORY_SLUGS.has(slug)) return slug as CategorySlug;
+  if (CATEGORY_ALIASES[slug]) return CATEGORY_ALIASES[slug];
+  return "other";
+}
+
+function slugifyCat(s: string) {
+  return s.toLowerCase().trim().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 
 const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
   ["electronics", [
     "phone", "smartphone", "laptop", "tablet", "tv", "television", "headphone", "headphones", "earbud", "earbuds",
     "camera", "gopro", "drone", "computer", "pc", "desktop", "monitor", "speaker", "soundbar", "subwoofer",
-    "console", "playstation", "ps5", "xbox", "nintendo", "switch", "airpod", "airpods", "ipad", "iphone", "macbook",
+    "airpod", "airpods", "ipad", "iphone", "macbook",
     "kindle", "router", "modem", "ssd", "hdd", "gpu", "rtx", "keyboard", "mouse", "webcam", "charger", "smartwatch",
     "fitbit", "garmin", "alexa", "echo dot", "ring doorbell", "projector", "printer",
+  ]],
+  ["gaming", [
+    "console", "playstation", "ps5", "ps4", "xbox", "nintendo switch", "nintendo", "gamecube",
+    "controller", "gaming chair", "gaming headset", "gaming mouse", "gaming keyboard", "steam deck",
+    "video game", "videogame", "vr headset", "oculus", "meta quest",
   ]],
   ["kitchen", [
     "kitchen", "blender", "mixer", "stand mixer", "air fryer", "fryer", "oven", "microwave", "cookware", "bakeware",
@@ -107,11 +195,17 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     "fitness", "workout", "massage gun", "foam roller", "peloton", "resistance band", "pull up bar",
     "weight bench", "barbell",
   ]],
+  ["tools", [
+    "drill", "power tool", "power tools", "dewalt", "milwaukee", "ryobi", "makita", "tool set",
+    "hammer", "wrench", "screwdriver", "circular saw", "miter saw", "table saw", "tool box",
+    "lawn mower", "leaf blower", "string trimmer", "hedge trimmer", "chainsaw", "pressure washer",
+  ]],
   ["home", [
     "vacuum", "robot vacuum", "mattress", "bedding", "comforter", "sheet set", "duvet", "pillow",
     "rug", "lamp", "ceiling fan", "air purifier", "humidifier", "dehumidifier", "furniture", "sofa",
-    "couch", "sectional", "chair", "recliner", "decor", "curtain", "blind", "drill", "power tool",
-    "dewalt", "milwaukee", "broom", "mop", "storage bin", "shelving",
+    "couch", "sectional", "chair", "recliner", "decor", "curtain", "blind",
+    "broom", "mop", "storage bin", "shelving", "planter", "patio", "gazebo", "garden hose",
+    "bird feeder", "outdoor furniture", "raised bed",
   ]],
   ["pets", [
     "dog", "puppy", "cat", "kitten", "pet", "leash", "collar", "harness", "kibble", "dog food",
@@ -127,7 +221,7 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     "first aid", "thermometer", "blood pressure", "pulse oximeter", "cpap", "heating pad",
     "compression sock", "wellness",
   ]],
-  ["grocery", [
+  ["food-beverage", [
     "snack", "snacks", "cereal", "granola", "chocolate", "candy", "chips", "popcorn", "beverage",
     "soda", "sparkling water", "tea", "ground coffee", "coffee pod", "k-cup", "olive oil",
     "pasta", "rice", "seasoning", "spice", "sauce", "jerky", "protein bar",
@@ -136,37 +230,22 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
     "car", "auto", "automotive", "tire", "tires", "motor oil", "wiper", "wiper blade", "dash cam",
     "jump starter", "car charger", "car mount", "car cover", "car seat cover", "obd", "garage",
   ]],
-  ["garden", [
-    "garden", "planter", "raised bed", "soil", "mulch", "fertilizer", "lawn mower", "leaf blower",
-    "string trimmer", "hedge trimmer", "seed", "seeds", "patio", "gazebo", "hose", "sprinkler",
-    "bird feeder", "outdoor furniture",
-  ]],
   ["office", [
     "office", "desk", "office chair", "standing desk", "monitor stand", "filing", "stationery",
     "notebook", "binder", "planner", "stapler", "shredder", "school supply", "school supplies",
-    "backpack", "lunch box", "calculator",
-  ]],
-  ["jewelry", [
-    "necklace", "bracelet", "earring", "earrings", "ring", "pendant", "diamond", "gold chain",
-    "silver chain", "watch", "rolex", "cartier", "engagement ring", "wedding band",
-  ]],
-  ["books", [
-    "book", "novel", "cookbook", "textbook", "audiobook", "kindle book", "ebook", "magazine",
-    "comic", "manga", "dvd", "blu-ray", "vinyl record",
-  ]],
-  ["music", [
-    "guitar", "acoustic guitar", "electric guitar", "bass guitar", "ukulele", "keyboard piano",
-    "digital piano", "drum kit", "drum set", "microphone", "midi controller", "audio interface",
-    "studio monitor", "synthesizer", "violin",
+    "lunch box", "calculator",
   ]],
   ["travel", [
     "luggage", "suitcase", "carry-on", "carry on", "travel bag", "duffel", "garment bag",
     "packing cube", "travel pillow", "passport holder",
   ]],
-  ["art", [
-    "art", "craft", "crafts", "paint set", "acrylic paint", "watercolor", "sketchbook",
-    "drawing pad", "colored pencil", "marker set", "easel", "canvas", "sewing machine", "knitting",
-    "crochet", "yarn", "embroidery", "scrapbook",
+  ["seasonal", [
+    "christmas", "christmas tree", "ornament", "advent calendar", "halloween", "halloween costume",
+    "easter", "thanksgiving", "valentine", "holiday decor", "string lights", "menorah",
+  ]],
+  ["fashion", [
+    "necklace", "bracelet", "earring", "earrings", "pendant", "diamond ring", "gold chain",
+    "silver chain", "engagement ring", "wedding band",
   ]],
 ];
 
@@ -203,16 +282,13 @@ const RETAILER_CATEGORY: Record<string, string> = {
   "buy-buy-baby": "baby", carters: "baby", "the-honest-company": "baby",
   // health
   gnc: "health", "vitamin-shoppe": "health", iherb: "health",
-  // grocery
-  "trader-joes": "grocery", "whole-foods": "grocery", instacart: "grocery", thrive: "grocery",
+  // food & beverage
+  "trader-joes": "food-beverage", "whole-foods": "food-beverage",
+  instacart: "food-beverage", thrive: "food-beverage",
   // automotive
   autozone: "automotive", "advance-auto-parts": "automotive", "oreilly-auto-parts": "automotive",
-  // jewelry
-  "blue-nile": "jewelry", "james-allen": "jewelry", pandora: "jewelry", tiffany: "jewelry",
-  // books
-  "barnes-and-noble": "books", "books-a-million": "books",
-  // music
-  "guitar-center": "music", "sweetwater": "music", "sam-ash": "music",
+  // jewelry → fashion
+  "blue-nile": "fashion", "james-allen": "fashion", pandora: "fashion", tiffany: "fashion",
   // travel
   away: "travel", samsonite: "travel", tumi: "travel",
 };
@@ -225,14 +301,16 @@ function titleHasWord(title: string, word: string): boolean {
   return new RegExp(`\\b${word}\\b`, "i").test(title);
 }
 
-export function deriveCategory(name: string, retailerSlug?: string): string {
+export function deriveCategory(name: string, retailerSlug?: string): CategorySlug {
   const n = name.toLowerCase();
   // Trusted retailer → category mappings win over title keywords, because
   // titles often contain words that accidentally match other categories
   // (e.g. a Frank & Eileen "Eileen Pan-Collared Shirt" matching "pan" → kitchen).
-  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) return RETAILER_CATEGORY[retailerSlug];
+  if (retailerSlug && RETAILER_CATEGORY[retailerSlug]) {
+    return normalizeCategory(RETAILER_CATEGORY[retailerSlug]);
+  }
   for (const [slug, words] of CATEGORY_KEYWORDS) {
-    if (words.some((w) => titleHasWord(n, w))) return slug;
+    if (words.some((w) => titleHasWord(n, w))) return normalizeCategory(slug);
   }
   return "other";
 }
@@ -354,6 +432,23 @@ export function dealsByRetailer(deals: Deal[], slug: string) {
 
 export function dealsByCategory(deals: Deal[], slug: string) {
   return activeDeals(deals).filter((d) => d.category === slug);
+}
+
+export function categoryCounts(deals: Deal[]): Map<CategorySlug, number> {
+  const counts = new Map<CategorySlug, number>();
+  for (const d of activeDeals(deals)) {
+    const slug = normalizeCategory(d.category);
+    counts.set(slug, (counts.get(slug) ?? 0) + 1);
+  }
+  return counts;
+}
+
+export function liveCategories(deals: Deal[]): Array<(typeof CATEGORIES)[number] & { count: number }> {
+  const counts = categoryCounts(deals);
+  return CATEGORIES.filter((c) => (counts.get(c.slug) ?? 0) > 0).map((c) => ({
+    ...c,
+    count: counts.get(c.slug) ?? 0,
+  }));
 }
 
 export function topDeals(deals: Deal[], limit = 8) {
