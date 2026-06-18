@@ -19,8 +19,12 @@ import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as GuidesLiquidationStoresRouteImport } from './routes/guides.liquidation-stores'
 import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
 import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazon-bin-stores'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const TrustRoute = TrustRouteImport.update({
@@ -73,6 +77,11 @@ const GuidesAmazonBinStoresRoute = GuidesAmazonBinStoresRouteImport.update({
   path: '/guides/amazon-bin-stores',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealSlugRoute = DealSlugRouteImport.update({
   id: '/deal/$slug',
   path: '/deal/$slug',
@@ -83,6 +92,23 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -99,11 +125,15 @@ export interface FileRoutesByFullPath {
   '/trust': typeof TrustRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -114,11 +144,15 @@ export interface FileRoutesByTo {
   '/trust': typeof TrustRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,11 +164,15 @@ export interface FileRoutesById {
   '/trust': typeof TrustRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,11 +185,15 @@ export interface FileRouteTypes {
     | '/trust'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/email/unsubscribe'
     | '/guides/amazon-bin-stores'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
+    | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,11 +204,15 @@ export interface FileRouteTypes {
     | '/trust'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/email/unsubscribe'
     | '/guides/amazon-bin-stores'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
+    | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -177,11 +223,15 @@ export interface FileRouteTypes {
     | '/trust'
     | '/category/$slug'
     | '/deal/$slug'
+    | '/email/unsubscribe'
     | '/guides/amazon-bin-stores'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
+    | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -193,11 +243,15 @@ export interface RootRouteChildren {
   TrustRoute: typeof TrustRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GuidesAmazonBinStoresRoute: typeof GuidesAmazonBinStoresRoute
   GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
   GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesAmazonBinStoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deal/$slug': {
       id: '/deal/$slug'
       path: '/deal/$slug'
@@ -284,6 +345,27 @@ declare module '@tanstack/react-router' {
       path: '/category/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
@@ -305,11 +387,15 @@ const rootRouteChildren: RootRouteChildren = {
   TrustRoute: TrustRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GuidesAmazonBinStoresRoute: GuidesAmazonBinStoresRoute,
   GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
   GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
   RetailerSlugRoute: RetailerSlugRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
