@@ -31,6 +31,7 @@ export const Route = createFileRoute("/deals")({
       { title: "All Deals — Wallet Wins" },
       { name: "description", content: "Browse every active deal. Filter by retailer, category, price, and discount." },
       { property: "og:title", content: "All Deals — Wallet Wins" },
+      { property: "og:description", content: "Browse every active deal. Filter by retailer, category, price, and discount." },
       { property: "og:url", content: "/deals" },
     ],
     links: [{ rel: "canonical", href: "/deals" }],

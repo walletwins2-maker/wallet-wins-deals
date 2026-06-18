@@ -20,6 +20,7 @@ export const Route = createFileRoute("/category/$slug")({
         { title: `${name} Deals — Wallet Wins` },
         { name: "description", content: `Save on ${name}. Browse the best ${name} deals and price drops.` },
         { property: "og:title", content: `${name} Deals — Wallet Wins` },
+        { property: "og:description", content: `Save on ${name}. Browse the best ${name} deals and price drops.` },
         { property: "og:url", content: `/category/${params.slug}` },
       ],
       links: [{ rel: "canonical", href: `/category/${params.slug}` }],
