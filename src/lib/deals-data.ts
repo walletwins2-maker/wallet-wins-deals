@@ -38,25 +38,108 @@ export const CATEGORIES = [
   { slug: "electronics", name: "Electronics", emoji: "📱" },
   { slug: "home", name: "Home", emoji: "🏠" },
   { slug: "kitchen", name: "Kitchen", emoji: "🍳" },
-  { slug: "beauty", name: "Beauty", emoji: "💄" },
   { slug: "fashion", name: "Fashion", emoji: "👗" },
-  { slug: "outdoor", name: "Outdoor", emoji: "🏕️" },
-  { slug: "toys", name: "Toys", emoji: "🧸" },
-  { slug: "fitness", name: "Fitness", emoji: "💪" },
-  { slug: "pets", name: "Pets", emoji: "🐾" },
-  { slug: "baby", name: "Baby & Kids", emoji: "🍼" },
+  { slug: "beauty", name: "Beauty", emoji: "💄" },
   { slug: "health", name: "Health", emoji: "💊" },
-  { slug: "grocery", name: "Grocery", emoji: "🛒" },
+  { slug: "fitness", name: "Fitness", emoji: "💪" },
+  { slug: "toys", name: "Toys", emoji: "🧸" },
+  { slug: "baby", name: "Baby", emoji: "🍼" },
+  { slug: "pets", name: "Pets", emoji: "🐾" },
+  { slug: "outdoor", name: "Outdoor", emoji: "🏕️" },
   { slug: "automotive", name: "Automotive", emoji: "🚗" },
-  { slug: "garden", name: "Garden", emoji: "🌿" },
-  { slug: "office", name: "Office & School", emoji: "🖇️" },
-  { slug: "jewelry", name: "Jewelry", emoji: "💍" },
-  { slug: "books", name: "Books & Media", emoji: "📚" },
-  { slug: "music", name: "Music & Instruments", emoji: "🎸" },
-  { slug: "travel", name: "Travel & Luggage", emoji: "🧳" },
-  { slug: "art", name: "Arts & Crafts", emoji: "🎨" },
+  { slug: "tools", name: "Tools", emoji: "🛠️" },
+  { slug: "travel", name: "Travel", emoji: "🧳" },
+  { slug: "office", name: "Office", emoji: "🖇️" },
+  { slug: "food-beverage", name: "Food & Beverage", emoji: "🛒" },
+  { slug: "gaming", name: "Gaming", emoji: "🎮" },
+  { slug: "seasonal", name: "Seasonal", emoji: "🎄" },
   { slug: "other", name: "Other", emoji: "🛍️" },
 ] as const;
+
+export type CategorySlug = (typeof CATEGORIES)[number]["slug"];
+const ALLOWED_CATEGORY_SLUGS = new Set<string>(CATEGORIES.map((c) => c.slug));
+
+// Normalize any incoming category-ish string (retailer feed, CJ/Impact taxonomy,
+// legacy slug, etc.) to an approved Wallet Wins category slug.
+const CATEGORY_ALIASES: Record<string, CategorySlug> = {
+  // legacy / removed slugs
+  grocery: "food-beverage",
+  "food-and-beverage": "food-beverage",
+  food: "food-beverage",
+  beverage: "food-beverage",
+  drinks: "food-beverage",
+  jewelry: "fashion",
+  jewellery: "fashion",
+  watches: "fashion",
+  shoes: "fashion",
+  clothing: "fashion",
+  apparel: "fashion",
+  accessories: "fashion",
+  garden: "home",
+  "lawn-and-garden": "home",
+  furniture: "home",
+  bedding: "home",
+  decor: "home",
+  storage: "home",
+  appliances: "home",
+  "power-tools": "tools",
+  hardware: "tools",
+  books: "other",
+  media: "other",
+  music: "other",
+  instruments: "other",
+  art: "other",
+  crafts: "other",
+  "arts-and-crafts": "other",
+  videogames: "gaming",
+  "video-games": "gaming",
+  console: "gaming",
+  consoles: "gaming",
+  holiday: "seasonal",
+  christmas: "seasonal",
+  halloween: "seasonal",
+  computers: "electronics",
+  laptops: "electronics",
+  "cell-phones": "electronics",
+  audio: "electronics",
+  tv: "electronics",
+  cookware: "kitchen",
+  "small-appliances": "kitchen",
+  "sports-and-outdoors": "outdoor",
+  sports: "outdoor",
+  camping: "outdoor",
+  hiking: "outdoor",
+  "pet-supplies": "pets",
+  "baby-and-kids": "baby",
+  kids: "baby",
+  skincare: "beauty",
+  makeup: "beauty",
+  fragrance: "beauty",
+  haircare: "beauty",
+  supplements: "health",
+  wellness: "health",
+  vitamins: "health",
+  exercise: "fitness",
+  workout: "fitness",
+  yoga: "fitness",
+  "car-and-truck": "automotive",
+  auto: "automotive",
+  luggage: "travel",
+  "school-supplies": "office",
+  stationery: "office",
+};
+
+export function normalizeCategory(raw: string | null | undefined): CategorySlug {
+  if (!raw) return "other";
+  const slug = slugifyCat(raw);
+  if (ALLOWED_CATEGORY_SLUGS.has(slug)) return slug as CategorySlug;
+  if (CATEGORY_ALIASES[slug]) return CATEGORY_ALIASES[slug];
+  return "other";
+}
+
+function slugifyCat(s: string) {
+  return s.toLowerCase().trim().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 
 const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
   ["electronics", [
