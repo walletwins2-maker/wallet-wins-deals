@@ -18,6 +18,7 @@ export const Route = createFileRoute("/retailer/$slug")({
         { title: `${name} Deals — Wallet Wins` },
         { name: "description", content: `Browse the latest ${name} deals, discounts and price drops.` },
         { property: "og:title", content: `${name} Deals — Wallet Wins` },
+        { property: "og:description", content: `Browse the latest ${name} deals, discounts and price drops.` },
         { property: "og:url", content: `/retailer/${params.slug}` },
       ],
       links: [{ rel: "canonical", href: `/retailer/${params.slug}` }],
