@@ -184,9 +184,21 @@ function AdminDashboard() {
           <h1 className="font-display text-3xl font-extrabold sm:text-4xl">Performance Dashboard</h1>
           <p className="text-sm text-muted-foreground">Overview of active deals and recent activity.</p>
         </div>
-        <span className="hidden rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase text-accent-foreground sm:inline">
-          Admin Preview
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="hidden rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase text-accent-foreground sm:inline">
+            Admin Preview
+          </span>
+          <button
+            type="button"
+            onClick={async () => {
+              await logout();
+              await router.invalidate();
+            }}
+            className="rounded-full border border-border px-3 py-1 text-xs font-bold uppercase text-muted-foreground hover:text-foreground"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
