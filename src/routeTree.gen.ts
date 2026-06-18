@@ -21,6 +21,7 @@ import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.cost
 import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazon-bin-stores'
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
@@ -82,6 +83,12 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +118,7 @@ export interface FileRoutesByTo {
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +134,7 @@ export interface FileRoutesById {
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -169,6 +181,7 @@ export interface FileRouteTypes {
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +197,7 @@ export interface RootRouteChildren {
   GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
   GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +309,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
   GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
   RetailerSlugRoute: RetailerSlugRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
