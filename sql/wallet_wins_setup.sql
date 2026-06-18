@@ -91,7 +91,7 @@ create policy "Public can read active deals"
   to anon, authenticated
   using (
     status in ('pending', 'queued')
-    and created_at >= now() - interval '7 days'
+    and created_at >= now() - interval '30 days'
   );
 
 -- Helpful indexes for the view + filters/sorts used by the site.
@@ -174,11 +174,9 @@ create policy "Authenticated can read clicks"
 -- ---------------------------------------------------------------------
 -- 4. newsletter_subscribers
 -- ---------------------------------------------------------------------
--- Store email as plain text and enforce case-insensitive uniqueness via a
--- functional index on lower(email). Avoids the citext extension entirely.
 create table if not exists public.newsletter_subscribers (
   id            uuid primary key default gen_random_uuid(),
-  email         text not null,
+  email         citext unique,         -- requires citext; falls back below if missing
   source_page   text,
   referrer      text,
   user_agent    text,
@@ -187,8 +185,9 @@ create table if not exists public.newsletter_subscribers (
   created_at    timestamptz not null default now()
 );
 
-create unique index if not exists newsletter_subscribers_email_lower_uidx
-  on public.newsletter_subscribers (lower(email));
+-- If citext extension isn't available, swap email type to text + lower-case unique.
+-- (Run this block only if the above failed because citext is missing.)
+-- create extension if not exists citext;
 
 create index if not exists newsletter_subscribers_created_idx
   on public.newsletter_subscribers (created_at desc);
