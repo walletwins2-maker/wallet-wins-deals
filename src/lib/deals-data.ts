@@ -282,16 +282,13 @@ const RETAILER_CATEGORY: Record<string, string> = {
   "buy-buy-baby": "baby", carters: "baby", "the-honest-company": "baby",
   // health
   gnc: "health", "vitamin-shoppe": "health", iherb: "health",
-  // grocery
-  "trader-joes": "grocery", "whole-foods": "grocery", instacart: "grocery", thrive: "grocery",
+  // food & beverage
+  "trader-joes": "food-beverage", "whole-foods": "food-beverage",
+  instacart: "food-beverage", thrive: "food-beverage",
   // automotive
   autozone: "automotive", "advance-auto-parts": "automotive", "oreilly-auto-parts": "automotive",
-  // jewelry
-  "blue-nile": "jewelry", "james-allen": "jewelry", pandora: "jewelry", tiffany: "jewelry",
-  // books
-  "barnes-and-noble": "books", "books-a-million": "books",
-  // music
-  "guitar-center": "music", "sweetwater": "music", "sam-ash": "music",
+  // jewelry → fashion
+  "blue-nile": "fashion", "james-allen": "fashion", pandora: "fashion", tiffany: "fashion",
   // travel
   away: "travel", samsonite: "travel", tumi: "travel",
 };
