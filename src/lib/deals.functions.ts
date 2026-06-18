@@ -33,7 +33,10 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
     });
     if (!res.ok) {
       const body = await res.text();
-      throw new Error(`Failed to load deals (${res.status}): ${body.slice(0, 200)}`);
+      // Log raw provider response server-side only; never leak schema/error
+      // details (column/constraint/relation names) to the browser.
+      console.error("[fetchDealsServer] upstream error", res.status, body.slice(0, 500));
+      throw new Error("Failed to load deals. Please try again.");
     }
     const rows = (await res.json()) as RawDeal[];
     return mapRawDeals(rows);
@@ -72,7 +75,9 @@ export const trackClickServer = createServerFn({ method: "POST" })
     });
     if (!res.ok) {
       // Non-fatal: swallow so the redirect to retailer still happens client-side.
-      return { ok: false as const, error: await res.text() };
+      const body = await res.text();
+      console.error("[trackClickServer] upstream error", res.status, body.slice(0, 500));
+      return { ok: false as const, error: "Click tracking failed." };
     }
     return { ok: true as const };
   });
@@ -99,7 +104,8 @@ export const subscribeNewsletterServer = createServerFn({ method: "POST" })
       const body = await res.text();
       // 409 conflict = already subscribed; treat as success.
       if (res.status === 409) return { ok: true as const };
-      return { ok: false as const, error: body.slice(0, 200) };
+      console.error("[subscribeNewsletterServer] upstream error", res.status, body.slice(0, 500));
+      return { ok: false as const, error: "Subscription failed. Please try again." };
     }
     return { ok: true as const };
   });

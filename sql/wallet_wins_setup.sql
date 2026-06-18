@@ -151,7 +151,10 @@ create index if not exists affiliate_clicks_fingerprint_idx
   on public.affiliate_clicks (product_fingerprint);
 
 grant insert on public.affiliate_clicks to anon, authenticated;
-grant select on public.affiliate_clicks to authenticated;  -- admin reads
+-- SELECT intentionally NOT granted to anon/authenticated.
+-- Click data (ip_hash, referrer, user_agent) is operator-only — read via
+-- service_role from trusted server code (e.g. an admin server function),
+-- never directly from the browser or a logged-in end user.
 
 alter table public.affiliate_clicks enable row level security;
 
@@ -162,13 +165,10 @@ create policy "Anyone can record a click"
   to anon, authenticated
   with check (true);
 
--- Only signed-in users can read clicks (refine to admins via your roles table).
+-- No SELECT policy for anon/authenticated: tracking rows contain PII-adjacent
+-- data (ip_hash, user_agent, referrer) and must not be readable by end users.
+-- Drop the previous overly-broad policy if it exists from an earlier setup run.
 drop policy if exists "Authenticated can read clicks" on public.affiliate_clicks;
-create policy "Authenticated can read clicks"
-  on public.affiliate_clicks
-  for select
-  to authenticated
-  using (true);
 
 
 -- ---------------------------------------------------------------------
@@ -193,7 +193,8 @@ create index if not exists newsletter_subscribers_created_idx
   on public.newsletter_subscribers (created_at desc);
 
 grant insert on public.newsletter_subscribers to anon, authenticated;
-grant select on public.newsletter_subscribers to authenticated;
+-- SELECT intentionally NOT granted: subscriber emails are PII and must only
+-- be readable by service_role (admin/back-office tooling), never by end users.
 
 alter table public.newsletter_subscribers enable row level security;
 
@@ -204,12 +205,9 @@ create policy "Anyone can subscribe"
   to anon, authenticated
   with check (true);
 
+-- No SELECT policy for anon/authenticated: subscriber emails are PII.
+-- Drop the previous overly-broad policy if it exists from an earlier setup run.
 drop policy if exists "Authenticated can read subscribers" on public.newsletter_subscribers;
-create policy "Authenticated can read subscribers"
-  on public.newsletter_subscribers
-  for select
-  to authenticated
-  using (true);
 
 
 -- ---------------------------------------------------------------------
