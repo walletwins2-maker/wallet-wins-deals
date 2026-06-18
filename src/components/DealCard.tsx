@@ -6,8 +6,8 @@ export function DealCard({ deal }: { deal: Deal }) {
   const retailer = retailerBySlug(deal.retailer);
   return (
     <Link
-      to="/deal/$id"
-      params={{ id: deal.id }}
+      to="/deal/$slug"
+      params={{ slug: deal.slug }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
