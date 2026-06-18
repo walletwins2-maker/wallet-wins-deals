@@ -109,6 +109,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-CD4XN6WDDG');",
       },
       {
+        children:
+          "(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7064891-3fa5-41b0-b077-0c421cc8c8d01.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');",
+      },
+      {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
