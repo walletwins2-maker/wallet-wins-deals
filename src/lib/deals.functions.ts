@@ -130,8 +130,7 @@ async function sendWelcomeEmail(email: string) {
   const element = React.createElement(template.component, template.previewData ?? {});
   const html = await render(element);
   const text = `Welcome to Wallet Wins!\n\nThanks for subscribing. Browse today's top deals at https://walletwins.shop/deals`;
-  const subject =
-    typeof template.subject === "function" ? template.subject({}) : template.subject;
+  const { subject } = template;
   await sendLovableEmail(
     {
       to: email,
