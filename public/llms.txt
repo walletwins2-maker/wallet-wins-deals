@@ -18,6 +18,7 @@ Wallet Wins surfaces the best active sales across electronics, home, kitchen, fa
 ## Guides
 
 - [Costco Coupon Book Guide](/guides/costco-coupon-book): How the Costco member-savings mailer works and how to stack it with current deals.
+- [Liquidation Stores Near Me](/guides/liquidation-stores): How to find local liquidation outlets, national chains, and online pallet sources.
 
 ## Optional
 

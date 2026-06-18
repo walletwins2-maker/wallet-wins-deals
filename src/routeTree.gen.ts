@@ -15,6 +15,7 @@ import { Route as DealsRouteImport } from './routes/deals'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
+import { Route as GuidesLiquidationStoresRouteImport } from './routes/guides.liquidation-stores'
 import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -49,6 +50,11 @@ const RetailerSlugRoute = RetailerSlugRouteImport.update({
   path: '/retailer/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesLiquidationStoresRoute = GuidesLiquidationStoresRouteImport.update({
+  id: '/guides/liquidation-stores',
+  path: '/guides/liquidation-stores',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
   id: '/guides/costco-coupon-book',
   path: '/guides/costco-coupon-book',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
+  '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
+  '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
+  '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/deal/$slug'
     | '/guides/costco-coupon-book'
+    | '/guides/liquidation-stores'
     | '/retailer/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/deal/$slug'
     | '/guides/costco-coupon-book'
+    | '/guides/liquidation-stores'
     | '/retailer/$slug'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/deal/$slug'
     | '/guides/costco-coupon-book'
+    | '/guides/liquidation-stores'
     | '/retailer/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
   GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
+  GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
 }
 
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetailerSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/liquidation-stores': {
+      id: '/guides/liquidation-stores'
+      path: '/guides/liquidation-stores'
+      fullPath: '/guides/liquidation-stores'
+      preLoaderRoute: typeof GuidesLiquidationStoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guides/costco-coupon-book': {
       id: '/guides/costco-coupon-book'
       path: '/guides/costco-coupon-book'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
   GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
+  GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
   RetailerSlugRoute: RetailerSlugRoute,
 }
 export const routeTree = rootRouteImport
