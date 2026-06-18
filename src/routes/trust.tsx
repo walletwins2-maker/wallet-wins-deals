@@ -118,13 +118,36 @@ function TrustPage() {
         </p>
       </Section>
 
+      <Section title="Full privacy policy">
+        <p>
+          The complete Wallet Wins privacy policy is published on Notion and is the authoritative
+          source for how we collect, use, and share data:
+        </p>
+        <p>
+          <a
+            href="https://glacier-bassoon-77f.notion.site/WalletWins-301abadcb7308051b399c5cffe59f0b7"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline"
+          >
+            Read the full Wallet Wins privacy policy →
+          </a>
+        </p>
+      </Section>
+
       <Section title="Contact">
         <p>
-          Questions, deletion requests, or security reports: email the Wallet Wins team at{" "}
-          <a href="mailto:privacy@walletwins.example" className="text-primary underline">
-            privacy@walletwins.example
+          Questions, deletion requests, or security reports: reach out through the contact details
+          listed in the{" "}
+          <a
+            href="https://glacier-bassoon-77f.notion.site/WalletWins-301abadcb7308051b399c5cffe59f0b7"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline"
+          >
+            full privacy policy
           </a>
-          . Replace this address with your own before publishing.
+          .
         </p>
       </Section>
 
