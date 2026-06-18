@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribedRouteImport } from './routes/unsubscribed'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
@@ -27,6 +28,11 @@ import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lova
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
+const UnsubscribedRoute = UnsubscribedRouteImport.update({
+  id: '/unsubscribed',
+  path: '/unsubscribed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
   path: '/trust',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
+  '/unsubscribed': typeof UnsubscribedRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
+  '/unsubscribed': typeof UnsubscribedRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
+  '/unsubscribed': typeof UnsubscribedRoute
   '/category/$slug': typeof CategorySlugRoute
   '/deal/$slug': typeof DealSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/trust'
+    | '/unsubscribed'
     | '/category/$slug'
     | '/deal/$slug'
     | '/email/unsubscribe'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/trust'
+    | '/unsubscribed'
     | '/category/$slug'
     | '/deal/$slug'
     | '/email/unsubscribe'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/trust'
+    | '/unsubscribed'
     | '/category/$slug'
     | '/deal/$slug'
     | '/email/unsubscribe'
@@ -241,6 +253,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrustRoute: typeof TrustRoute
+  UnsubscribedRoute: typeof UnsubscribedRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -256,6 +269,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribed': {
+      id: '/unsubscribed'
+      path: '/unsubscribed'
+      fullPath: '/unsubscribed'
+      preLoaderRoute: typeof UnsubscribedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trust': {
       id: '/trust'
       path: '/trust'
@@ -385,6 +405,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrustRoute: TrustRoute,
+  UnsubscribedRoute: UnsubscribedRoute,
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
