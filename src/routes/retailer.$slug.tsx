@@ -13,6 +13,7 @@ export const Route = createFileRoute("/retailer/$slug")({
   },
   head: ({ loaderData, params }) => {
     const name = loaderData?.retailer?.name ?? params.slug;
+    const deals = loaderData?.deals ?? [];
     return {
       meta: [
         { title: `${name} Deals — Wallet Wins` },
@@ -22,6 +23,27 @@ export const Route = createFileRoute("/retailer/$slug")({
         { property: "og:url", content: `/retailer/${params.slug}` },
       ],
       links: [{ rel: "canonical", href: `/retailer/${params.slug}` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: `${name} Deals`,
+            url: `/retailer/${params.slug}`,
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: deals.length,
+              itemListElement: deals.slice(0, 20).map((d, i) => ({
+                "@type": "ListItem",
+                position: i + 1,
+                url: `/deal/${d.slug}`,
+                name: d.product_name,
+              })),
+            },
+          }),
+        },
+      ],
     };
   },
   component: RetailerPage,
