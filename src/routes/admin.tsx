@@ -3,7 +3,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Activity, Package, Store, Tag } from "lucide-react";
+import { Activity, Download, Package, Store, Tag } from "lucide-react";
 import {
   CATEGORIES,
   activeDeals,
@@ -60,6 +60,88 @@ const logoutAdmin = createServerFn({ method: "POST" }).handler(async () => {
   deleteCookie(ADMIN_COOKIE, { path: "/" });
   return { ok: true as const };
 });
+
+// CSV export of affiliate_clicks for a date range + optional retailer filter.
+// Gated by the same HttpOnly admin cookie as the dashboard itself; returns an
+// error envelope (never throws schema details) when unauthorized or upstream
+// fails.
+function isoBoundary(input: string, end: boolean): string | null {
+  // Accept YYYY-MM-DD; normalize to a full-day UTC boundary.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) return null;
+  return end ? `${input}T23:59:59.999Z` : `${input}T00:00:00.000Z`;
+}
+
+function csvEscape(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  const s = String(value);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+const exportAffiliateClicks = createServerFn({ method: "POST" })
+  .inputValidator((d: { startDate: string; endDate: string; retailer?: string }) => d)
+  .handler(async ({ data }) => {
+    const expected = process.env.ADMIN_DASHBOARD_TOKEN;
+    const cookie = getCookie(ADMIN_COOKIE);
+    if (!expected || !cookie || !constantTimeEqual(cookie, expected)) {
+      return { ok: false as const, error: "Unauthorized." };
+    }
+    const url = process.env.WALLETWINS_DB_URL;
+    const key = process.env.WALLETWINS_DB_ANON_KEY;
+    if (!url || !key) {
+      return { ok: false as const, error: "Backend not configured." };
+    }
+    const start = isoBoundary(data.startDate, false);
+    const end = isoBoundary(data.endDate, true);
+    if (!start || !end) {
+      return { ok: false as const, error: "Invalid date range." };
+    }
+    const qs = new URLSearchParams({
+      select:
+        "id,deal_id,product_fingerprint,retailer,source_page,referrer,created_at",
+      order: "created_at.desc",
+      limit: "50000",
+    });
+    qs.append("created_at", `gte.${start}`);
+    qs.append("created_at", `lte.${end}`);
+    if (data.retailer && data.retailer.trim()) {
+      qs.append("retailer", `eq.${data.retailer.trim()}`);
+    }
+    const res = await fetch(`${url}/rest/v1/affiliate_clicks?${qs.toString()}`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+      },
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("[exportAffiliateClicks] upstream error", res.status, body.slice(0, 500));
+      return { ok: false as const, error: "Export failed. Please try again." };
+    }
+    const rows = (await res.json()) as Array<Record<string, unknown>>;
+    const headers = [
+      "id",
+      "deal_id",
+      "product_fingerprint",
+      "retailer",
+      "source_page",
+      "referrer",
+      "created_at",
+    ];
+    const lines = [headers.join(",")];
+    for (const row of rows) {
+      lines.push(headers.map((h) => csvEscape(row[h])).join(","));
+    }
+    return {
+      ok: true as const,
+      csv: lines.join("\n"),
+      count: rows.length,
+      filename: `affiliate_clicks_${data.startDate}_to_${data.endDate}${
+        data.retailer ? `_${data.retailer}` : ""
+      }.csv`,
+    };
+  });
 
 export const Route = createFileRoute("/admin")({
   loader: async ({ context }) => {
@@ -150,6 +232,7 @@ function AdminLogin() {
 function AdminDashboard() {
   const router = useRouter();
   const logout = useServerFn(logoutAdmin);
+  const exportClicks = useServerFn(exportAffiliateClicks);
   const { data: allDeals } = useSuspenseQuery(dealsQueryOptions);
   const deals = activeDeals(allDeals);
   const today = deals.filter((d) => {
@@ -158,6 +241,11 @@ function AdminDashboard() {
   });
 
   const byRetailer = topRetailers(deals, 50);
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
 
   const byCategory = CATEGORIES.map((c) => ({
     ...c,
@@ -263,6 +351,13 @@ function AdminDashboard() {
         )}
       </Panel>
 
+      <ExportClicksPanel
+        defaultStart={sevenDaysAgo}
+        defaultEnd={todayIso}
+        retailers={byRetailer.filter((r) => r.count > 0)}
+        onExport={exportClicks}
+      />
+
       <Panel title="Highest-Score Deals" className="mt-6">
         <ul className="divide-y divide-border text-sm">
           {[...deals].sort((a, b) => b.deal_score - a.deal_score).slice(0, 8).map((d) => (
@@ -302,5 +397,124 @@ function Panel({ title, className = "", children }: { title: string; className?:
       <h3 className="mb-2 font-display text-lg font-extrabold">{title}</h3>
       {children}
     </div>
+  );
+}
+
+function ExportClicksPanel({
+  defaultStart,
+  defaultEnd,
+  retailers,
+  onExport,
+}: {
+  defaultStart: string;
+  defaultEnd: string;
+  retailers: Array<{ slug: string; name: string }>;
+  onExport: (args: {
+    data: { startDate: string; endDate: string; retailer?: string };
+  }) => Promise<
+    | { ok: true; csv: string; filename: string; count: number }
+    | { ok: false; error: string }
+  >;
+}) {
+  const [startDate, setStartDate] = useState(defaultStart);
+  const [endDate, setEndDate] = useState(defaultEnd);
+  const [retailer, setRetailer] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  return (
+    <Panel title="Export Affiliate Clicks" className="mt-6">
+      <p className="mb-4 text-sm text-muted-foreground">
+        Download a CSV of click events for the selected date range and retailer.
+      </p>
+      <form
+        className="grid gap-3 sm:grid-cols-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (busy) return;
+          setBusy(true);
+          setMsg(null);
+          setErr(null);
+          try {
+            const res = await onExport({
+              data: {
+                startDate,
+                endDate,
+                retailer: retailer || undefined,
+              },
+            });
+            if (!res.ok) {
+              setErr(res.error);
+              return;
+            }
+            const blob = new Blob([res.csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = res.filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            setMsg(`Exported ${res.count} click${res.count === 1 ? "" : "s"}.`);
+          } catch {
+            setErr("Export failed. Please try again.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <label className="flex flex-col gap-1 text-xs font-semibold uppercase text-muted-foreground">
+          Start date
+          <input
+            type="date"
+            value={startDate}
+            max={endDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-background px-3 text-sm normal-case text-foreground"
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs font-semibold uppercase text-muted-foreground">
+          End date
+          <input
+            type="date"
+            value={endDate}
+            min={startDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-background px-3 text-sm normal-case text-foreground"
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs font-semibold uppercase text-muted-foreground">
+          Retailer
+          <select
+            value={retailer}
+            onChange={(e) => setRetailer(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-background px-3 text-sm normal-case text-foreground"
+          >
+            <option value="">All retailers</option>
+            {retailers.map((r) => (
+              <option key={r.slug} value={r.name}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="flex items-end">
+          <button
+            type="submit"
+            disabled={busy}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-gradient-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+            {busy ? "Exporting…" : "Export CSV"}
+          </button>
+        </div>
+      </form>
+      {msg && <p className="mt-3 text-xs text-success">{msg}</p>}
+      {err && <p className="mt-3 text-xs text-red-500">{err}</p>}
+    </Panel>
   );
 }
