@@ -216,7 +216,7 @@ export const subscribeNewsletterServer = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Please enter a valid email." };
     }
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key) {
       console.error("[subscribeNewsletterServer] missing local backend env");
       return { ok: false as const, error: "Subscription failed. Please try again." };
