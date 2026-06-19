@@ -54,6 +54,46 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
       return [];
     }
     const rows = (await res.json()) as RawDeal[];
+    // Ensure Amazon always fills its 30-slot cap. The primary fetch is ordered
+    // by created_at desc, so older Amazon rows can fall outside the 1000-row
+    // window. Top up with a dedicated Amazon query when short.
+    const amazonCount = rows.filter(
+      (r) => (r.retailer ?? "").toLowerCase() === "amazon",
+    ).length;
+    if (amazonCount < 30) {
+      try {
+        const need = 30 - amazonCount;
+        const aqs = new URLSearchParams({
+          select:
+            "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
+          status: "in.(pending,queued)",
+          retailer: "eq.amazon",
+          order: "deal_score.desc.nullslast,created_at.desc,id.desc",
+          limit: String(Math.max(need * 3, 60)),
+        });
+        const ares = await fetch(`${url}/rest/v1/live_deals?${aqs.toString()}`, {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            Accept: "application/json",
+            "Range-Unit": "items",
+            Prefer: "count=none",
+          },
+        });
+        if (ares.ok) {
+          const extra = (await ares.json()) as RawDeal[];
+          const seen = new Set(rows.map((r) => String(r.id)));
+          for (const r of extra) {
+            if (!seen.has(String(r.id))) {
+              rows.push(r);
+              seen.add(String(r.id));
+            }
+          }
+        }
+      } catch (err) {
+        console.error("[fetchDealsServer] amazon top-up failed", err);
+      }
+    }
     return diversifyByRetailer(mapRawDeals(rows), 30);
   },
 );
