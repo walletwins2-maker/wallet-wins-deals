@@ -167,7 +167,11 @@ function AmazonBinStoresGuide() {
       <div className="rounded-lg border border-border bg-muted/40 p-6">
         <h2 className="text-lg font-semibold text-foreground">Prefer online deals?</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          If you'd rather skip the drive, browse today's biggest price drops from trusted retailers.
+          If you'd rather skip the drive, browse today's biggest price drops, or learn how to{" "}
+          <Link to="/guides/amazon-return-pallets" className="text-primary hover:underline">
+            buy Amazon return pallets online
+          </Link>
+          .
         </p>
         <Link
           to="/deals"
