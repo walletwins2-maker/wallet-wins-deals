@@ -32,6 +32,7 @@ function Index() {
   const featured = topDeals(deals, 8);
   const drops = recentDrops(deals, 8);
   const retailers = topRetailers(deals, 8);
+  const allRetailers = topRetailers(deals, 1000);
   const categories = liveCategories(deals);
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
