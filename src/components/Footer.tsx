@@ -62,7 +62,7 @@ export function Footer() {
               liveRetailers.map((r) => (
                 <li key={r.slug}>
                   <Link to="/retailer/$slug" params={{ slug: r.slug }} className="hover:text-foreground">
-                    {r.name}
+                    {r.name} <span className="text-xs text-muted-foreground/70">({r.count})</span>
                   </Link>
                 </li>
               ))
