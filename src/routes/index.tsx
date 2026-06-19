@@ -1,6 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
+
+const savingGuides = [
+  {
+    slug: "amazon-bin-stores",
+    title: "Amazon Bin Stores",
+    description: "How $7 bin stores work and how to score returns for cheap.",
+  },
+  {
+    slug: "costco-coupon-book",
+    title: "Costco Coupon Book",
+    description: "Maximize savings with this month's Costco coupon book.",
+  },
+  {
+    slug: "liquidation-stores",
+    title: "Liquidation Stores",
+    description: "Find pallets, overstock, and deep discounts near you.",
+  },
+] as const;
 import { DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
 import { liveCategories, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
@@ -69,6 +87,27 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/* Saving Guides */}
+      <SectionHeader title="Saving Guides" />
+      <p className="-mt-4 mb-4 text-sm text-muted-foreground">
+        Tips and walkthroughs to save more.
+      </p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {savingGuides.map((g) => (
+          <Link
+            key={g.slug}
+            to={`/guides/${g.slug}` as string}
+            className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
+          >
+            <h3 className="font-display text-lg font-bold">{g.title}</h3>
+            <p className="mt-1 flex-1 text-sm text-muted-foreground">{g.description}</p>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+              Read guide <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+        ))}
+      </div>
 
       {/* Featured */}
       <SectionHeader title="🔥 Featured Deals" link="/deals" linkLabel="See all" />
