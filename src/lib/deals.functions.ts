@@ -215,8 +215,14 @@ export const subscribeNewsletterServer = createServerFn({ method: "POST" })
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       return { ok: false as const, error: "Please enter a valid email." };
     }
-    const { url, key } = dbCreds();
-    const res = await fetch(`${url}/rest/v1/newsletter_subscribers`, {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      console.error("[subscribeNewsletterServer] missing local backend env");
+      return { ok: false as const, error: "Subscription failed. Please try again." };
+    }
+    const sourcePage = data.source_page ? data.source_page.trim().slice(0, 300) : null;
+    const res = await fetch(`${url}/rest/v1/newsletter_subscribers?on_conflict=email`, {
       method: "POST",
       headers: {
         apikey: key,
@@ -224,7 +230,7 @@ export const subscribeNewsletterServer = createServerFn({ method: "POST" })
         "Content-Type": "application/json",
         Prefer: "return=minimal,resolution=ignore-duplicates",
       },
-      body: JSON.stringify({ email, source_page: data.source_page ?? null }),
+      body: JSON.stringify({ email, source_page: sourcePage }),
     });
     if (!res.ok) {
       const body = await res.text();
