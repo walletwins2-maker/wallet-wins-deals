@@ -18,6 +18,11 @@ const savingGuides = [
     title: "Liquidation Stores",
     description: "Find pallets, overstock, and deep discounts near you.",
   },
+  {
+    to: "/guides/amazon-return-pallets" as const,
+    title: "Amazon Return Pallets",
+    description: "Buy, bid, and flip Amazon returns from B-Stock and Liquidation.com.",
+  },
 ];
 import { DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
