@@ -13,6 +13,24 @@ const SENDER_DOMAIN = "notify.walletwins.shop"
 // Can be the root domain when display_from_root is enabled — this is cosmetic only.
 const FROM_DOMAIN = "notify.walletwins.shop"
 
+// Server-controlled canonical site URL — never trust caller-provided URLs in templateData.
+const SITE_URL = "https://walletwins.shop"
+
+// Keys in templateData that represent URLs/links. These are always overridden with
+// server-controlled values to prevent attackers from injecting phishing links into
+// branded emails sent from our infrastructure.
+const URL_KEYS = new Set(['siteUrl', 'site_url', 'url', 'link', 'href', 'actionUrl', 'action_url', 'ctaUrl', 'cta_url'])
+
+function sanitizeTemplateData(data: Record<string, any>): Record<string, any> {
+  const clean: Record<string, any> = {}
+  for (const [k, v] of Object.entries(data)) {
+    if (URL_KEYS.has(k)) continue // drop caller-supplied URLs
+    clean[k] = v
+  }
+  clean.siteUrl = SITE_URL
+  return clean
+}
+
 function redactEmail(email: string | null | undefined): string {
   if (!email) return '***'
   const [localPart, domain] = email.split('@')
@@ -59,6 +77,8 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const callerEmail = user.email?.toLowerCase()
+
         // Parse request body
         let templateName: string
         let recipientEmail: string
@@ -101,15 +121,25 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
-        // Resolve effective recipient: template-level `to` takes precedence over
-        // the caller-provided recipientEmail. This allows notification templates
-        // to always send to a fixed address (e.g., site owner from env var).
-        const effectiveRecipient = template.to || recipientEmail
+        // Resolve effective recipient:
+        // 1. Template-level fixed `to` (server-controlled, e.g. site owner) wins.
+        // 2. Otherwise the recipient is forced to the authenticated caller's own
+        //    email. Callers cannot send branded emails to arbitrary addresses,
+        //    which prevents abuse of our email infrastructure for phishing.
+        const effectiveRecipient = template.to || callerEmail
+
+        if (template.to == null && recipientEmail && callerEmail
+            && recipientEmail.toLowerCase() !== callerEmail) {
+          return Response.json(
+            { error: 'Recipient must match the authenticated user' },
+            { status: 403 }
+          )
+        }
 
         if (!effectiveRecipient) {
           return Response.json(
             {
-              error: 'recipientEmail is required (unless the template defines a fixed recipient)',
+              error: 'Authenticated user has no email and template has no fixed recipient',
             },
             { status: 400 }
           )
@@ -251,15 +281,18 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ success: false, reason: 'email_suppressed' })
         }
 
-        // 4. Render React Email template to HTML and plain text
-        const element = React.createElement(template.component, templateData)
+        // 4. Render React Email template to HTML and plain text.
+        // Sanitize templateData to strip caller-supplied URLs — only server-side
+        // SITE_URL is allowed for links in branded email content.
+        const safeTemplateData = sanitizeTemplateData(templateData)
+        const element = React.createElement(template.component, safeTemplateData)
         const html = await render(element)
         const plainText = await render(element, { plainText: true })
 
         // Resolve subject — supports static string or dynamic function
         const resolvedSubject =
           typeof template.subject === 'function'
-            ? template.subject(templateData)
+            ? template.subject(safeTemplateData)
             : template.subject
 
         // 5. Enqueue the pre-rendered email for async processing by the dispatcher.
