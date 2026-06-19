@@ -4,17 +4,17 @@ import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 
 const savingGuides = [
   {
-    slug: "amazon-bin-stores",
+    to: "/guides/amazon-bin-stores",
     title: "Amazon Bin Stores",
     description: "How $7 bin stores work and how to score returns for cheap.",
   },
   {
-    slug: "costco-coupon-book",
+    to: "/guides/costco-coupon-book",
     title: "Costco Coupon Book",
     description: "Maximize savings with this month's Costco coupon book.",
   },
   {
-    slug: "liquidation-stores",
+    to: "/guides/liquidation-stores",
     title: "Liquidation Stores",
     description: "Find pallets, overstock, and deep discounts near you.",
   },
@@ -96,8 +96,8 @@ function Index() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {savingGuides.map((g) => (
           <Link
-            key={g.slug}
-            to={`/guides/${g.slug}` as string}
+            key={g.to}
+            to={g.to}
             className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
           >
             <h3 className="font-display text-lg font-bold">{g.title}</h3>
