@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, MapPin, Tag } from "lucide-react";
 
-const TITLE = "Amazon Bin Stores: How They Work & How to Find One — Wallet Wins";
+const TITLE = "Amazon Bin Stores: How They Work & Where to Find Them";
 const DESCRIPTION =
   "Amazon Bin Stores resell returns and overstock in weekly cycles that drop to $1. Here's how the pricing works, what to expect, and how to find a bin store near you.";
 const URL_PATH = "/guides/amazon-bin-stores";
