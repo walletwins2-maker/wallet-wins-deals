@@ -4,21 +4,21 @@ import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 
 const savingGuides = [
   {
-    to: "/guides/amazon-bin-stores",
+    to: "/guides/amazon-bin-stores" as const,
     title: "Amazon Bin Stores",
     description: "How $7 bin stores work and how to score returns for cheap.",
   },
   {
-    to: "/guides/costco-coupon-book",
+    to: "/guides/costco-coupon-book" as const,
     title: "Costco Coupon Book",
     description: "Maximize savings with this month's Costco coupon book.",
   },
   {
-    to: "/guides/liquidation-stores",
+    to: "/guides/liquidation-stores" as const,
     title: "Liquidation Stores",
     description: "Find pallets, overstock, and deep discounts near you.",
   },
-] as const;
+];
 import { DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
 import { liveCategories, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
@@ -95,9 +95,9 @@ function Index() {
       </p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {savingGuides.map((g) => (
-          <Link
+          <a
             key={g.to}
-            to={g.to}
+            href={g.to}
             className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
           >
             <h3 className="font-display text-lg font-bold">{g.title}</h3>
@@ -105,7 +105,7 @@ function Index() {
             <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
               Read guide <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
             </span>
-          </Link>
+          </a>
         ))}
       </div>
 
