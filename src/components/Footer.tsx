@@ -2,8 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
-import { CATEGORIES, liveCategories, topRetailers } from "@/lib/deals-data";
+import { CATEGORIES, liveCategories } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
+
+const SAVING_GUIDES = [
+  { to: "/guides/amazon-bin-stores", name: "Amazon Bin Stores" },
+  { to: "/guides/costco-coupon-book", name: "Costco Coupon Book" },
+  { to: "/guides/liquidation-stores", name: "Liquidation Stores" },
+] as const;
 
 export function Footer() {
   // Render a stable placeholder on the server and first client paint so SSR
@@ -13,9 +19,8 @@ export function Footer() {
   const { data: deals = [] } = useQuery({ ...dealsQueryOptions, retry: false });
 
   const liveCats = liveCategories(deals).slice(0, 6);
-  const liveRetailers = topRetailers(deals, 6);
 
-  const showLive = hydrated && (liveCats.length > 0 || liveRetailers.length > 0);
+  const showLive = hydrated && liveCats.length > 0;
   const categories = showLive && liveCats.length
     ? liveCats
     : CATEGORIES.slice(0, 6).map((c) => ({ ...c, count: 0 }));
@@ -52,21 +57,13 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Retailers</h4>
+          <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Saving Guides</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {!showLive ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <li key={i} className="opacity-40">—</li>
-              ))
-            ) : (
-              liveRetailers.map((r) => (
-                <li key={r.slug}>
-                  <Link to="/retailer/$slug" params={{ slug: r.slug }} className="hover:text-foreground">
-                    {r.name} <span className="text-xs text-muted-foreground/70">({r.count})</span>
-                  </Link>
-                </li>
-              ))
-            )}
+            {SAVING_GUIDES.map((g) => (
+              <li key={g.to}>
+                <a href={g.to} className="hover:text-foreground">{g.name}</a>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
