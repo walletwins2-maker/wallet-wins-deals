@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as GuidesLiquidationStoresRouteImport } from './routes/guides.liquidation-stores'
 import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
+import { Route as GuidesAmazonReturnPalletsRouteImport } from './routes/guides.amazon-return-pallets'
 import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazon-bin-stores'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DealSlugRouteImport } from './routes/deal.$slug'
@@ -80,6 +81,12 @@ const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
   path: '/guides/costco-coupon-book',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesAmazonReturnPalletsRoute =
+  GuidesAmazonReturnPalletsRouteImport.update({
+    id: '/guides/amazon-return-pallets',
+    path: '/guides/amazon-return-pallets',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GuidesAmazonBinStoresRoute = GuidesAmazonBinStoresRouteImport.update({
   id: '/guides/amazon-bin-stores',
   path: '/guides/amazon-bin-stores',
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/deal/$slug': typeof DealSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
+  '/guides/amazon-return-pallets': typeof GuidesAmazonReturnPalletsRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -168,6 +176,7 @@ export interface FileRoutesByTo {
   '/deal/$slug': typeof DealSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
+  '/guides/amazon-return-pallets': typeof GuidesAmazonReturnPalletsRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -191,6 +200,7 @@ export interface FileRoutesById {
   '/deal/$slug': typeof DealSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/guides/amazon-bin-stores': typeof GuidesAmazonBinStoresRoute
+  '/guides/amazon-return-pallets': typeof GuidesAmazonReturnPalletsRoute
   '/guides/costco-coupon-book': typeof GuidesCostcoCouponBookRoute
   '/guides/liquidation-stores': typeof GuidesLiquidationStoresRoute
   '/retailer/$slug': typeof RetailerSlugRoute
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/deal/$slug'
     | '/email/unsubscribe'
     | '/guides/amazon-bin-stores'
+    | '/guides/amazon-return-pallets'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/deal/$slug'
     | '/email/unsubscribe'
     | '/guides/amazon-bin-stores'
+    | '/guides/amazon-return-pallets'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
@@ -259,6 +271,7 @@ export interface FileRouteTypes {
     | '/deal/$slug'
     | '/email/unsubscribe'
     | '/guides/amazon-bin-stores'
+    | '/guides/amazon-return-pallets'
     | '/guides/costco-coupon-book'
     | '/guides/liquidation-stores'
     | '/retailer/$slug'
@@ -282,6 +295,7 @@ export interface RootRouteChildren {
   DealSlugRoute: typeof DealSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GuidesAmazonBinStoresRoute: typeof GuidesAmazonBinStoresRoute
+  GuidesAmazonReturnPalletsRoute: typeof GuidesAmazonReturnPalletsRoute
   GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
   GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
@@ -363,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/guides/costco-coupon-book'
       fullPath: '/guides/costco-coupon-book'
       preLoaderRoute: typeof GuidesCostcoCouponBookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/amazon-return-pallets': {
+      id: '/guides/amazon-return-pallets'
+      path: '/guides/amazon-return-pallets'
+      fullPath: '/guides/amazon-return-pallets'
+      preLoaderRoute: typeof GuidesAmazonReturnPalletsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guides/amazon-bin-stores': {
@@ -450,6 +471,7 @@ const rootRouteChildren: RootRouteChildren = {
   DealSlugRoute: DealSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GuidesAmazonBinStoresRoute: GuidesAmazonBinStoresRoute,
+  GuidesAmazonReturnPalletsRoute: GuidesAmazonReturnPalletsRoute,
   GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
   GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
   RetailerSlugRoute: RetailerSlugRoute,
