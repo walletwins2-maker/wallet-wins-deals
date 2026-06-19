@@ -88,6 +88,7 @@ function Index() {
               {r.name[0]}
             </span>
             <span className="text-sm font-semibold">{r.name}</span>
+            <span className="text-xs text-muted-foreground">{r.count} deals</span>
           </Link>
         ))}
       </div>
