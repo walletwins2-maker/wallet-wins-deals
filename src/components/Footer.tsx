@@ -5,6 +5,7 @@ const SAVING_GUIDES = [
   { to: "/guides/amazon-bin-stores", name: "Amazon Bin Stores" },
   { to: "/guides/costco-coupon-book", name: "Costco Coupon Book" },
   { to: "/guides/liquidation-stores", name: "Liquidation Stores" },
+  { to: "/guides/amazon-return-pallets", name: "Amazon Return Pallets" },
 ] as const;
 
 const SOCIAL_LINKS = [
