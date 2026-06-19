@@ -250,8 +250,12 @@ function AdminLogin() {
 
 function AdminDashboard() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const logout = useServerFn(logoutAdmin);
   const exportClicks = useServerFn(exportAffiliateClicks);
+  const refreshDeals = useServerFn(refreshDealsAdmin);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
   const { data: allDeals } = useSuspenseQuery(dealsQueryOptions);
   const deals = activeDeals(allDeals);
   const today = deals.filter((d) => {
@@ -297,6 +301,32 @@ function AdminDashboard() {
           </span>
           <button
             type="button"
+            disabled={refreshing}
+            onClick={async () => {
+              setRefreshing(true);
+              setRefreshMsg(null);
+              try {
+                const res = await refreshDeals();
+                if (!res.ok) {
+                  setRefreshMsg(res.error);
+                } else {
+                  await queryClient.invalidateQueries({ queryKey: dealsQueryOptions.queryKey });
+                  await queryClient.refetchQueries({ queryKey: dealsQueryOptions.queryKey });
+                  setRefreshMsg(`Refreshed ${res.count} deals.`);
+                }
+              } catch {
+                setRefreshMsg("Refresh failed.");
+              } finally {
+                setRefreshing(false);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-bold uppercase text-muted-foreground hover:text-foreground disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </button>
+          <button
+            type="button"
             onClick={async () => {
               await logout();
               await router.invalidate();
@@ -307,6 +337,9 @@ function AdminDashboard() {
           </button>
         </div>
       </div>
+      {refreshMsg && (
+        <p className="mt-2 text-xs text-muted-foreground" role="status">{refreshMsg}</p>
+      )}
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat icon={<Package />} label="Total Deals" value={deals.length} />
