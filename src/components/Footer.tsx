@@ -1,9 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Wallet } from "lucide-react";
-import { CATEGORIES, liveCategories } from "@/lib/deals-data";
-import { dealsQueryOptions } from "@/lib/deals-query";
+import { Facebook, Instagram, Wallet } from "lucide-react";
 
 const SAVING_GUIDES = [
   { to: "/guides/amazon-bin-stores", name: "Amazon Bin Stores" },
@@ -11,20 +7,12 @@ const SAVING_GUIDES = [
   { to: "/guides/liquidation-stores", name: "Liquidation Stores" },
 ] as const;
 
+const SOCIAL_LINKS = [
+  { href: "https://www.facebook.com/WalletWins2", name: "Facebook", Icon: Facebook },
+  { href: "https://www.instagram.com/walletwins2/", name: "Instagram", Icon: Instagram },
+] as const;
+
 export function Footer() {
-  // Render a stable placeholder on the server and first client paint so SSR
-  // and hydration match exactly. After mount, swap in live data.
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
-  const { data: deals = [] } = useQuery({ ...dealsQueryOptions, retry: false });
-
-  const liveCats = liveCategories(deals).slice(0, 6);
-
-  const showLive = hydrated && liveCats.length > 0;
-  const categories = showLive && liveCats.length
-    ? liveCats
-    : CATEGORIES.slice(0, 6).map((c) => ({ ...c, count: 0 }));
-
   return (
     <footer className="mt-20 border-t border-border bg-muted/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
@@ -42,16 +30,18 @@ export function Footer() {
           </p>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Categories</h4>
+          <h4 className="mb-3 text-sm font-bold uppercase tracking-wide">Follow Us</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {categories.map((c) => (
-              <li key={c.slug}>
-                <Link to="/category/$slug" params={{ slug: c.slug }} className="hover:text-foreground">
-                  {c.name}
-                  {showLive && c.count > 0 && (
-                    <span className="ml-1 text-xs text-muted-foreground/70">({c.count})</span>
-                  )}
-                </Link>
+            {SOCIAL_LINKS.map(({ href, name, Icon }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 hover:text-foreground"
+                >
+                  <Icon className="h-4 w-4" /> {name}
+                </a>
               </li>
             ))}
           </ul>
