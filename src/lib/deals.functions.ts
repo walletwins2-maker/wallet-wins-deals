@@ -58,12 +58,17 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// Reorders deals to maximize retailer variety on the first screens while
-// preserving every deal. Groups by retailer (sorted by deal_score desc within
-// each group), caps each retailer at `maxPerRetailer`, then round-robins
-// across retailers. Overflow beyond the cap is appended at the end so no
+// Reorders deals to maximize retailer AND category variety on the first
+// screens while preserving every deal. For each retailer, the top
+// `maxPerRetailer` are chosen by round-robining across categories (so a
+// retailer's slot isn't dominated by one category), then retailers are
+// round-robined against each other. Overflow is appended at the end so no
 // deals are lost.
 function diversifyByRetailer(deals: Deal[], maxPerRetailer: number): Deal[] {
+  const scoreOf = (d: Deal) =>
+    typeof (d as { deal_score?: number }).deal_score === "number"
+      ? (d as { deal_score: number }).deal_score
+      : 0;
   const groups = new Map<string, Deal[]>();
   for (const d of deals) {
     const key = (d.retailer ?? "unknown").toLowerCase();
@@ -71,16 +76,38 @@ function diversifyByRetailer(deals: Deal[], maxPerRetailer: number): Deal[] {
     arr.push(d);
     groups.set(key, arr);
   }
-  const scoreOf = (d: Deal) =>
-    typeof (d as { deal_score?: number }).deal_score === "number"
-      ? (d as { deal_score: number }).deal_score
-      : 0;
   const capped: Deal[][] = [];
   const overflow: Deal[] = [];
   for (const list of groups.values()) {
-    list.sort((a, b) => scoreOf(b) - scoreOf(a));
-    capped.push(list.slice(0, maxPerRetailer));
-    if (list.length > maxPerRetailer) overflow.push(...list.slice(maxPerRetailer));
+    // Within a retailer, group by category and round-robin across categories
+    // so the top-N for that retailer spans as many categories as possible.
+    const byCat = new Map<string, Deal[]>();
+    for (const d of list) {
+      const ck = (d.category ?? "unknown").toLowerCase();
+      const arr = byCat.get(ck) ?? [];
+      arr.push(d);
+      byCat.set(ck, arr);
+    }
+    const catQueues = Array.from(byCat.values());
+    for (const q of catQueues) q.sort((a, b) => scoreOf(b) - scoreOf(a));
+    catQueues.sort((a, b) => scoreOf(b[0]) - scoreOf(a[0]));
+    const picked: Deal[] = [];
+    let i = 0;
+    let added = true;
+    while (added && picked.length < maxPerRetailer) {
+      added = false;
+      for (const q of catQueues) {
+        if (picked.length >= maxPerRetailer) break;
+        if (q[i]) {
+          picked.push(q[i]);
+          added = true;
+        }
+      }
+      i++;
+    }
+    capped.push(picked);
+    const pickedSet = new Set(picked);
+    for (const d of list) if (!pickedSet.has(d)) overflow.push(d);
   }
   // Order retailer queues by their top deal so strongest deals still surface early.
   capped.sort((a, b) => scoreOf(b[0]) - scoreOf(a[0]));
