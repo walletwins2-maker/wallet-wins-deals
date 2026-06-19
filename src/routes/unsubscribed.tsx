@@ -6,6 +6,17 @@ export const Route = createFileRoute("/unsubscribed")({
   head: () => ({
     meta: [
       { title: "Unsubscribe — Wallet Wins" },
+      {
+        name: "description",
+        content:
+          "Unsubscribe from Wallet Wins deal alerts and email updates. Confirm your one-click unsubscribe link to stop future emails.",
+      },
+      { property: "og:title", content: "Unsubscribe — Wallet Wins" },
+      {
+        property: "og:description",
+        content:
+          "Confirm your one-click unsubscribe link to stop future Wallet Wins emails.",
+      },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
