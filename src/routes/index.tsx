@@ -32,6 +32,7 @@ function Index() {
   const featured = topDeals(deals, 8);
   const drops = recentDrops(deals, 8);
   const retailers = topRetailers(deals, 8);
+  const allRetailers = topRetailers(deals, 1000);
   const categories = liveCategories(deals);
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -92,6 +93,32 @@ function Index() {
           </Link>
         ))}
       </div>
+
+      {/* Browse all retailers */}
+      {allRetailers.length > retailers.length && (
+        <>
+          <SectionHeader title="Browse All Retailers" />
+          <div className="flex flex-wrap gap-2">
+            {allRetailers.map((r) => (
+              <Link
+                key={r.slug}
+                to="/retailer/$slug"
+                params={{ slug: r.slug }}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
+              >
+                <span
+                  className="grid h-5 w-5 place-items-center rounded-full text-[10px] font-extrabold text-white"
+                  style={{ backgroundColor: r.color }}
+                >
+                  {r.name[0]}
+                </span>
+                <span className="font-semibold">{r.name}</span>
+                <span className="text-xs text-muted-foreground">{r.count}</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Categories */}
       {categories.length > 0 && (
