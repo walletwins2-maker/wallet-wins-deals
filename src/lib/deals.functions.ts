@@ -54,9 +54,53 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
       return [];
     }
     const rows = (await res.json()) as RawDeal[];
-    return mapRawDeals(rows);
+    return diversifyByRetailer(mapRawDeals(rows), 30);
   },
 );
+
+// Reorders deals to maximize retailer variety on the first screens while
+// preserving every deal. Groups by retailer (sorted by deal_score desc within
+// each group), caps each retailer at `maxPerRetailer`, then round-robins
+// across retailers. Overflow beyond the cap is appended at the end so no
+// deals are lost.
+function diversifyByRetailer(deals: Deal[], maxPerRetailer: number): Deal[] {
+  const groups = new Map<string, Deal[]>();
+  for (const d of deals) {
+    const key = (d.retailer ?? "unknown").toLowerCase();
+    const arr = groups.get(key) ?? [];
+    arr.push(d);
+    groups.set(key, arr);
+  }
+  const scoreOf = (d: Deal) =>
+    typeof (d as { deal_score?: number }).deal_score === "number"
+      ? (d as { deal_score: number }).deal_score
+      : 0;
+  const capped: Deal[][] = [];
+  const overflow: Deal[] = [];
+  for (const list of groups.values()) {
+    list.sort((a, b) => scoreOf(b) - scoreOf(a));
+    capped.push(list.slice(0, maxPerRetailer));
+    if (list.length > maxPerRetailer) overflow.push(...list.slice(maxPerRetailer));
+  }
+  // Order retailer queues by their top deal so strongest deals still surface early.
+  capped.sort((a, b) => scoreOf(b[0]) - scoreOf(a[0]));
+  const out: Deal[] = [];
+  let added = true;
+  let i = 0;
+  while (added) {
+    added = false;
+    for (const queue of capped) {
+      if (queue[i]) {
+        out.push(queue[i]);
+        added = true;
+      }
+    }
+    i++;
+  }
+  overflow.sort((a, b) => scoreOf(b) - scoreOf(a));
+  out.push(...overflow);
+  return out;
+}
 
 export const trackClickServer = createServerFn({ method: "POST" })
   .inputValidator(
