@@ -77,13 +77,12 @@ function Index() {
             >
               Browse Deals <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              to="/category/$slug"
-              params={{ slug: "electronics" }}
+            <a
+              href="#recent-price-drops"
               className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
             >
-              Shop Electronics
-            </Link>
+              Recent Price Drops
+            </a>
           </div>
         </div>
       </section>
@@ -192,7 +191,9 @@ function Index() {
       )}
 
       {/* Recent drops */}
-      <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} />
+      <div id="recent-price-drops" className="scroll-mt-24">
+        <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} />
+      </div>
       <DealGrid deals={drops} />
 
       <Newsletter />
