@@ -2,8 +2,8 @@ import { useState } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Activity, Download, Package, Store, Tag } from "lucide-react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Activity, Download, Package, RefreshCw, Store, Tag } from "lucide-react";
 import {
   CATEGORIES,
   activeDeals,
@@ -12,6 +12,7 @@ import {
   topRetailers,
 } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
+import { fetchDealsServer } from "@/lib/deals.functions";
 
 // Operator-only dashboard. The secret is submitted via POST (never as a URL
 // query parameter, which would leak into logs / browser history / Referer
@@ -59,6 +60,24 @@ const loginAdmin = createServerFn({ method: "POST" })
 const logoutAdmin = createServerFn({ method: "POST" }).handler(async () => {
   deleteCookie(ADMIN_COOKIE, { path: "/" });
   return { ok: true as const };
+});
+
+// Admin-gated server action that re-fetches deals from the upstream DB,
+// bypassing the React Query cache. Returns the fresh count so the UI can
+// confirm. Verifies the HttpOnly admin cookie; no upstream writes.
+const refreshDealsAdmin = createServerFn({ method: "POST" }).handler(async () => {
+  const expected = process.env.ADMIN_DASHBOARD_TOKEN;
+  const cookie = getCookie(ADMIN_COOKIE);
+  if (!expected || !cookie || !constantTimeEqual(cookie, expected)) {
+    return { ok: false as const, error: "Unauthorized." };
+  }
+  try {
+    const deals = await fetchDealsServer();
+    return { ok: true as const, count: deals.length, refreshedAt: new Date().toISOString() };
+  } catch (err) {
+    console.error("[refreshDealsAdmin] fetch failed", err);
+    return { ok: false as const, error: "Refresh failed. Please try again." };
+  }
 });
 
 // CSV export of affiliate_clicks for a date range + optional retailer filter.
