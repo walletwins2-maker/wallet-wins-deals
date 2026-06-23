@@ -64,12 +64,12 @@ function Index() {
             >
               Browse Deals <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              to="/guides"
+            <a
+              href="#saving-guides"
               className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
             >
               Savings Guides <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
             <a
               href="#recent-price-drops"
               className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
