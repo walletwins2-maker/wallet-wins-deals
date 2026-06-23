@@ -92,6 +92,27 @@ function Index() {
         </div>
       </section>
 
+      {/* Amazon Deals */}
+      <Link
+        to="/retailer/$slug"
+        params={{ slug: "amazon" }}
+        className="group mt-10 flex items-center gap-5 rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-[#FF9900] hover:shadow-card-hover sm:p-6"
+      >
+        <span
+          className="grid h-14 w-14 shrink-0 place-items-center rounded-xl text-lg font-extrabold text-white sm:h-16 sm:w-16 sm:text-xl"
+          style={{ backgroundColor: "#FF9900" }}
+        >
+          <ShoppingBag className="h-7 w-7 sm:h-8 sm:w-8" />
+        </span>
+        <div className="flex-1">
+          <h2 className="font-display text-lg font-bold sm:text-xl">Amazon Deals</h2>
+          <p className="text-sm text-muted-foreground">
+            Browse the latest discounts, price drops, and markdowns from Amazon.
+          </p>
+        </div>
+        <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-[#FF9900]" />
+      </Link>
+
       {/* Saving Guides */}
       <SectionHeader title="Saving Guides" />
       <p className="-mt-4 mb-4 text-sm text-muted-foreground">
