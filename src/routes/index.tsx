@@ -29,6 +29,28 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const savingGuides = [
+    {
+      to: "/guides/amazon-bin-stores" as const,
+      title: "Amazon Bin Stores",
+      description: "How $7 bin stores work and how to score returns for cheap.",
+    },
+    {
+      to: "/guides/costco-coupon-book" as const,
+      title: "Costco Coupon Book",
+      description: "Maximize savings with this month's Costco coupon book.",
+    },
+    {
+      to: "/guides/liquidation-stores" as const,
+      title: "Liquidation Stores",
+      description: "Find pallets, overstock, and deep discounts near you.",
+    },
+    {
+      to: "/guides/amazon-return-pallets" as const,
+      title: "Amazon Return Pallets",
+      description: "Buy, bid, and flip Amazon returns from B-Stock and Liquidation.com.",
+    },
+  ];
   const { data: deals } = useSuspenseQuery(dealsQueryOptions);
   const featured = topDeals(deals, 8);
   const drops = recentDrops(deals, 8);
