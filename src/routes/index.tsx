@@ -214,8 +214,11 @@ function SectionHeader({
         {title}
       </h2>
       {link && (
-        <Link to={link} className="shrink-0 text-sm font-semibold text-primary hover:underline">
-          {linkLabel ?? "View all"} →
+        <Link
+          to={link}
+          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
+        >
+          {linkLabel ?? "View all"}
         </Link>
       )}
     </div>
