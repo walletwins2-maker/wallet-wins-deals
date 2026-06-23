@@ -145,7 +145,7 @@ function Index() {
 
       {/* Recent drops */}
       <div id="recent-price-drops" className="scroll-mt-24">
-        <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} link="/guides" linkLabel="Savings Guides" />
+        <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} />
       </div>
       <DealGrid deals={drops} />
 
