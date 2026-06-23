@@ -64,11 +64,17 @@ function Index() {
             >
               Browse Deals <ArrowRight className="h-4 w-4" />
             </Link>
+            <Link
+              to="/guides"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
+            >
+              Savings Guides <ArrowRight className="h-4 w-4" />
+            </Link>
             <a
               href="#recent-price-drops"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
             >
-              Recent Price Drops
+              Recent Price Drops <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </div>
