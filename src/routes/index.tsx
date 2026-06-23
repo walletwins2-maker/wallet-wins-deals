@@ -141,8 +141,11 @@ function Index() {
         </div>
         <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-[#FF9900]" />
       </Link>
+      <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#FF9900]/30 bg-[#FF9900]/10 px-4 py-2 text-sm font-semibold text-[#FF9900]">
+        <Sparkles className="h-4 w-4" /> Amazon Prime Days — June 23–26, 2026
+      </div>
       {amazonDeals.length > 0 && (
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {amazonDeals.map((deal) => (
             <DealCard key={deal.id} deal={deal} />
           ))}
