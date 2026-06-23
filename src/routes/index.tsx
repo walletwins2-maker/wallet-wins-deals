@@ -60,8 +60,11 @@ function Index() {
     .sort((a, b) => a.name.localeCompare(b.name));
   const categories = liveCategories(deals);
   const amazonDeals = (() => {
-    const amazon = deals.filter((d) => d.retailer === "amazon").sort((a, b) => b.deal_score - a.deal_score);
-    // Pick up to 9 from distinct categories
+    // Sort by biggest discount first so category winners are the deepest cuts.
+    const amazon = deals
+      .filter((d) => d.retailer === "amazon")
+      .sort((a, b) => b.discount - a.discount);
+    // One deal per category for variety
     const seen = new Set<string>();
     const picked: typeof amazon = [];
     for (const d of amazon) {
@@ -71,17 +74,18 @@ function Index() {
       }
       if (picked.length >= 9) break;
     }
-    // If we don't have 9 distinct categories, fill with highest-scored remaining
+    // Fill remaining slots with the next deepest discounts
     if (picked.length < 9) {
       for (const d of amazon) {
-        if (!picked.includes(d)) {
-          picked.push(d);
-        }
+        if (!picked.includes(d)) picked.push(d);
         if (picked.length >= 9) break;
       }
     }
-    return picked;
+    // Re-sort final picks by discount so the best savings render first
+    return picked.sort((a, b) => b.discount - a.discount);
   })();
+  // Highlight the top 3 discounts in the Amazon grid
+  const amazonTopIds = new Set(amazonDeals.slice(0, 3).map((d) => d.id));
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
@@ -148,9 +152,26 @@ function Index() {
         <>
           <SectionHeader title="Amazon Deals" link="/retailer/amazon" linkLabel="See all" />
           <div className="grid grid-cols-3 gap-4">
-            {amazonDeals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
-            ))}
+            {amazonDeals.map((deal) => {
+              const isTop = amazonTopIds.has(deal.id);
+              return (
+                <div
+                  key={deal.id}
+                  className={
+                    isTop
+                      ? "relative rounded-2xl ring-2 ring-[#FF9900] ring-offset-2 ring-offset-background"
+                      : "relative"
+                  }
+                >
+                  {isTop && (
+                    <span className="absolute -top-2 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#FF9900] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-sm">
+                      Best Discount
+                    </span>
+                  )}
+                  <DealCard deal={deal} />
+                </div>
+              );
+            })}
           </div>
         </>
       )}
