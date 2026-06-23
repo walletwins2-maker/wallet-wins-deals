@@ -54,7 +54,8 @@ export function Header() {
               key={n.to}
               to={n.to}
               className="rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
-              activeProps={{ className: "text-foreground bg-muted" }}
+              activeProps={{ className: "rounded-full px-3 py-2 text-sm font-medium text-foreground bg-muted transition hover:bg-muted hover:text-foreground" }}
+              activeOptions={{ exact: n.to === "/guides" }}
             >
               {n.label}
             </Link>
@@ -91,6 +92,8 @@ export function Header() {
                 to={n.to}
                 onClick={() => setOpen(false)}
                 className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground"
+                activeProps={{ className: "rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground" }}
+                activeOptions={{ exact: n.to === "/guides" }}
               >
                 {n.label}
               </Link>
