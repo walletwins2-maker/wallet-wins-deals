@@ -62,22 +62,29 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
-        // Verify the caller has a valid Supabase auth token.
-        // In TanStack, there is no Supabase gateway — we validate the JWT ourselves.
+        // Gate on service-role bearer token. This endpoint enqueues branded
+        // emails from our infrastructure and must only be callable by trusted
+        // server code (other server functions / server routes that load the
+        // service role key). End-user JWTs are NOT accepted — that would let
+        // any signed-in user drain sending quota, inject arbitrary text into
+        // branded templates, or trigger sends to template-fixed operator
+        // addresses. Matches the auth pattern used by /lovable/email/queue/process.
         const authHeader = request.headers.get('Authorization')
         if (!authHeader?.startsWith('Bearer ')) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
-
-        const token = authHeader.slice('Bearer '.length).trim()
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-
-        if (authError || !user) {
+        const presented = authHeader.slice('Bearer '.length).trim()
+        const expected = supabaseServiceKey
+        const a = new TextEncoder().encode(presented)
+        const b = new TextEncoder().encode(expected)
+        let ok = a.length === b.length
+        const len = Math.max(a.length, b.length)
+        let diff = a.length ^ b.length
+        for (let i = 0; i < len; i++) diff |= (a[i] ?? 0) ^ (b[i] ?? 0)
+        if (!ok || diff !== 0) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
-
-        const callerEmail = user.email?.toLowerCase()
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
         // Parse request body
         let templateName: string
@@ -123,18 +130,8 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
 
         // Resolve effective recipient:
         // 1. Template-level fixed `to` (server-controlled, e.g. site owner) wins.
-        // 2. Otherwise the recipient is forced to the authenticated caller's own
-        //    email. Callers cannot send branded emails to arbitrary addresses,
-        //    which prevents abuse of our email infrastructure for phishing.
-        const effectiveRecipient = template.to || callerEmail
-
-        if (template.to == null && recipientEmail && callerEmail
-            && recipientEmail.toLowerCase() !== callerEmail) {
-          return Response.json(
-            { error: 'Recipient must match the authenticated user' },
-            { status: 403 }
-          )
-        }
+        // 2. Otherwise the caller (trusted service-role server code) supplies it.
+        const effectiveRecipient = template.to || recipientEmail
 
         if (!effectiveRecipient) {
           return Response.json(
