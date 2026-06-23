@@ -59,6 +59,10 @@ function Index() {
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
   const categories = liveCategories(deals);
+  const amazonDeals = deals
+    .filter((d) => d.retailer === "amazon")
+    .sort((a, b) => b.deal_score - a.deal_score)
+    .slice(0, 3);
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
