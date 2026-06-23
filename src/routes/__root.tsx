@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GOOGLE_ADS_CONVERSION_ID } from "@/lib/google-ads";
 
 function NotFoundComponent() {
   return (
@@ -108,6 +109,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children:
           "window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-CD4XN6WDDG');",
       },
+      ...(GOOGLE_ADS_CONVERSION_ID
+        ? [
+            {
+              children: `gtag('config', ${JSON.stringify(GOOGLE_ADS_CONVERSION_ID)});`,
+            },
+          ]
+        : []),
       {
         children:
           "(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7064891-3fa5-41b0-b077-0c421cc8c8d01.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');",

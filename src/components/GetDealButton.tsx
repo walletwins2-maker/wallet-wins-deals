@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import type { Deal } from "@/lib/deals-data";
 import { trackClickServer } from "@/lib/deals.functions";
+import { trackAffiliateClick } from "@/lib/google-ads";
 
 export function GetDealButton({ deal, large = false }: { deal: Deal; large?: boolean }) {
   const trackClick = useServerFn(trackClickServer);
@@ -16,6 +17,22 @@ export function GetDealButton({ deal, large = false }: { deal: Deal; large?: boo
           source_page: typeof window !== "undefined" ? window.location.pathname : undefined,
           referrer: typeof document !== "undefined" ? document.referrer : undefined,
         },
+      });
+    } catch {
+      /* ignore */
+    }
+    try {
+      const discount =
+        typeof deal.original_price === "number" && typeof deal.price === "number"
+          ? Math.max(0, deal.original_price - deal.price)
+          : undefined;
+      trackAffiliateClick({
+        dealId: deal.id,
+        retailer: deal.retailer,
+        productName: deal.product_name,
+        productUrl: deal.product_url,
+        value: discount,
+        currency: "USD",
       });
     } catch {
       /* ignore */
