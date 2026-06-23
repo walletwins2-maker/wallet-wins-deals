@@ -112,53 +112,6 @@ function Index() {
       <SectionHeader title="🔥 Featured Deals" link="/deals" linkLabel="See all" />
       <DealGrid deals={featured} />
 
-      {/* Retailers */}
-      <SectionHeader title="Trending Retailers" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-        {retailers.map((r) => (
-          <Link
-            key={r.slug}
-            to="/retailer/$slug"
-            params={{ slug: r.slug }}
-            className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-card p-4 text-center shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
-          >
-            <span
-              className="grid h-12 w-12 place-items-center rounded-xl text-lg font-extrabold text-white"
-              style={{ backgroundColor: r.color }}
-            >
-              {r.name[0]}
-            </span>
-            <span className="text-sm font-semibold">{r.name}</span>
-            <span className="text-xs text-muted-foreground">{r.count} deals</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Browse all retailers */}
-      {allRetailers.length > retailers.length && (
-        <>
-          <SectionHeader title="Browse All Retailers" />
-          <div className="flex flex-wrap gap-2">
-            {allRetailers.map((r) => (
-              <Link
-                key={r.slug}
-                to="/retailer/$slug"
-                params={{ slug: r.slug }}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
-              >
-                <span
-                  className="grid h-5 w-5 place-items-center rounded-full text-[10px] font-extrabold text-white"
-                  style={{ backgroundColor: r.color }}
-                >
-                  {r.name[0]}
-                </span>
-                <span className="font-semibold">{r.name}</span>
-                <span className="text-xs text-muted-foreground">{r.count}</span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
 
       {/* Categories */}
       {categories.length > 0 && (
