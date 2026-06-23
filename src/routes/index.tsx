@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles, TrendingDown } from "lucide-react";
+import { ArrowRight, ShoppingBag, Sparkles, TrendingDown } from "lucide-react";
 
 const savingGuides = [
   {
