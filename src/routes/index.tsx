@@ -24,7 +24,7 @@ const savingGuides = [
     description: "Buy, bid, and flip Amazon returns from B-Stock and Liquidation.com.",
   },
 ];
-import { DealGrid } from "@/components/DealCard";
+import { DealCard, DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
 import { liveCategories, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
