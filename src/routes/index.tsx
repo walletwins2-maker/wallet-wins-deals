@@ -145,11 +145,14 @@ function Index() {
         <Sparkles className="h-4 w-4" /> Amazon Prime Days — June 23–26, 2026
       </div>
       {amazonDeals.length > 0 && (
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {amazonDeals.map((deal) => (
-            <DealCard key={deal.id} deal={deal} />
-          ))}
-        </div>
+        <>
+          <SectionHeader title="Amazon Deals" link="/retailer/amazon" linkLabel="See all" />
+          <div className="grid grid-cols-3 gap-4">
+            {amazonDeals.map((deal) => (
+              <DealCard key={deal.id} deal={deal} />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Featured */}
