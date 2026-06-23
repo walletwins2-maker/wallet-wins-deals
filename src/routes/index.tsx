@@ -149,6 +149,29 @@ function Index() {
       </div>
       <DealGrid deals={drops} />
 
+      {/* Saving Guides */}
+      <div id="saving-guides" className="scroll-mt-24">
+        <SectionHeader title="Saving Guides" icon={<BookOpen className="h-5 w-5 text-primary" />} />
+      </div>
+      <p className="-mt-2 mb-4 text-sm text-muted-foreground">
+        Tips and walkthroughs to save more.
+      </p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {savingGuides.map((g) => (
+          <a
+            key={g.to}
+            href={g.to}
+            className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
+          >
+            <h3 className="font-display text-lg font-bold">{g.title}</h3>
+            <p className="mt-1 flex-1 text-sm text-muted-foreground">{g.description}</p>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+              Read guide <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+            </span>
+          </a>
+        ))}
+      </div>
+
       <Newsletter />
       <div className="h-10" />
     </div>
