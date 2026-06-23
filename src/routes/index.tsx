@@ -59,10 +59,29 @@ function Index() {
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
   const categories = liveCategories(deals);
-  const amazonDeals = deals
-    .filter((d) => d.retailer === "amazon")
-    .sort((a, b) => b.deal_score - a.deal_score)
-    .slice(0, 3);
+  const amazonDeals = (() => {
+    const amazon = deals.filter((d) => d.retailer === "amazon").sort((a, b) => b.deal_score - a.deal_score);
+    // Pick up to 9 from distinct categories
+    const seen = new Set<string>();
+    const picked: typeof amazon = [];
+    for (const d of amazon) {
+      if (!seen.has(d.category)) {
+        seen.add(d.category);
+        picked.push(d);
+      }
+      if (picked.length >= 9) break;
+    }
+    // If we don't have 9 distinct categories, fill with highest-scored remaining
+    if (picked.length < 9) {
+      for (const d of amazon) {
+        if (!picked.includes(d)) {
+          picked.push(d);
+        }
+        if (picked.length >= 9) break;
+      }
+    }
+    return picked;
+  })();
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
