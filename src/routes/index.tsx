@@ -2,28 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, ShoppingBag, Sparkles, TrendingDown } from "lucide-react";
 
-const savingGuides = [
-  {
-    to: "/guides/amazon-bin-stores" as const,
-    title: "Amazon Bin Stores",
-    description: "How $7 bin stores work and how to score returns for cheap.",
-  },
-  {
-    to: "/guides/costco-coupon-book" as const,
-    title: "Costco Coupon Book",
-    description: "Maximize savings with this month's Costco coupon book.",
-  },
-  {
-    to: "/guides/liquidation-stores" as const,
-    title: "Liquidation Stores",
-    description: "Find pallets, overstock, and deep discounts near you.",
-  },
-  {
-    to: "/guides/amazon-return-pallets" as const,
-    title: "Amazon Return Pallets",
-    description: "Buy, bid, and flip Amazon returns from B-Stock and Liquidation.com.",
-  },
-];
 import { DealCard, DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
 import { liveCategories, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
@@ -123,27 +101,6 @@ function Index() {
           ))}
         </div>
       )}
-
-      {/* Saving Guides */}
-      <SectionHeader title="Saving Guides" />
-      <p className="-mt-4 mb-4 text-sm text-muted-foreground">
-        Tips and walkthroughs to save more.
-      </p>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {savingGuides.map((g) => (
-          <a
-            key={g.to}
-            href={g.to}
-            className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
-          >
-            <h3 className="font-display text-lg font-bold">{g.title}</h3>
-            <p className="mt-1 flex-1 text-sm text-muted-foreground">{g.description}</p>
-            <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-              Read guide <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-            </span>
-          </a>
-        ))}
-      </div>
 
       {/* Featured */}
       <SectionHeader title="🔥 Featured Deals" link="/deals" linkLabel="See all" />

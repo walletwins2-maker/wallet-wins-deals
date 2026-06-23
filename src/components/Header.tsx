@@ -16,6 +16,7 @@ export function Header() {
 
   const nav = [
     { to: "/deals", label: "All Deals" },
+    { to: "/guides", label: "Savings Guides" },
     { to: "/category/electronics", label: "Electronics" },
     { to: "/category/home", label: "Home" },
     { to: "/category/fashion", label: "Fashion" },

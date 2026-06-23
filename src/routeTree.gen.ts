@@ -13,6 +13,7 @@ import { Route as UnsubscribedRouteImport } from './routes/unsubscribed'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -51,6 +52,11 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesRoute = GuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealsRoute = DealsRouteImport.update({
   id: '/deals',
   path: '/deals',
@@ -72,25 +78,25 @@ const RetailerSlugRoute = RetailerSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidesLiquidationStoresRoute = GuidesLiquidationStoresRouteImport.update({
-  id: '/guides/liquidation-stores',
-  path: '/guides/liquidation-stores',
-  getParentRoute: () => rootRouteImport,
+  id: '/liquidation-stores',
+  path: '/liquidation-stores',
+  getParentRoute: () => GuidesRoute,
 } as any)
 const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
-  id: '/guides/costco-coupon-book',
-  path: '/guides/costco-coupon-book',
-  getParentRoute: () => rootRouteImport,
+  id: '/costco-coupon-book',
+  path: '/costco-coupon-book',
+  getParentRoute: () => GuidesRoute,
 } as any)
 const GuidesAmazonReturnPalletsRoute =
   GuidesAmazonReturnPalletsRouteImport.update({
-    id: '/guides/amazon-return-pallets',
-    path: '/guides/amazon-return-pallets',
-    getParentRoute: () => rootRouteImport,
+    id: '/amazon-return-pallets',
+    path: '/amazon-return-pallets',
+    getParentRoute: () => GuidesRoute,
   } as any)
 const GuidesAmazonBinStoresRoute = GuidesAmazonBinStoresRouteImport.update({
-  id: '/guides/amazon-bin-stores',
-  path: '/guides/amazon-bin-stores',
-  getParentRoute: () => rootRouteImport,
+  id: '/amazon-bin-stores',
+  path: '/amazon-bin-stores',
+  getParentRoute: () => GuidesRoute,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/deals'
+    | '/guides'
     | '/search'
     | '/sitemap.xml'
     | '/trust'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/deals'
+    | '/guides'
     | '/search'
     | '/sitemap.xml'
     | '/trust'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/deals'
+    | '/guides'
     | '/search'
     | '/sitemap.xml'
     | '/trust'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   DealsRoute: typeof DealsRoute
+  GuidesRoute: typeof GuidesRouteWithChildren
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrustRoute: typeof TrustRoute
@@ -294,10 +307,6 @@ export interface RootRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
   DealSlugRoute: typeof DealSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
-  GuidesAmazonBinStoresRoute: typeof GuidesAmazonBinStoresRoute
-  GuidesAmazonReturnPalletsRoute: typeof GuidesAmazonReturnPalletsRoute
-  GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
-  GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
   RetailerSlugRoute: typeof RetailerSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -337,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides': {
+      id: '/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof GuidesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deals': {
       id: '/deals'
       path: '/deals'
@@ -367,31 +383,31 @@ declare module '@tanstack/react-router' {
     }
     '/guides/liquidation-stores': {
       id: '/guides/liquidation-stores'
-      path: '/guides/liquidation-stores'
+      path: '/liquidation-stores'
       fullPath: '/guides/liquidation-stores'
       preLoaderRoute: typeof GuidesLiquidationStoresRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GuidesRoute
     }
     '/guides/costco-coupon-book': {
       id: '/guides/costco-coupon-book'
-      path: '/guides/costco-coupon-book'
+      path: '/costco-coupon-book'
       fullPath: '/guides/costco-coupon-book'
       preLoaderRoute: typeof GuidesCostcoCouponBookRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GuidesRoute
     }
     '/guides/amazon-return-pallets': {
       id: '/guides/amazon-return-pallets'
-      path: '/guides/amazon-return-pallets'
+      path: '/amazon-return-pallets'
       fullPath: '/guides/amazon-return-pallets'
       preLoaderRoute: typeof GuidesAmazonReturnPalletsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GuidesRoute
     }
     '/guides/amazon-bin-stores': {
       id: '/guides/amazon-bin-stores'
-      path: '/guides/amazon-bin-stores'
+      path: '/amazon-bin-stores'
       fullPath: '/guides/amazon-bin-stores'
       preLoaderRoute: typeof GuidesAmazonBinStoresRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GuidesRoute
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -459,10 +475,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface GuidesRouteChildren {
+  GuidesAmazonBinStoresRoute: typeof GuidesAmazonBinStoresRoute
+  GuidesAmazonReturnPalletsRoute: typeof GuidesAmazonReturnPalletsRoute
+  GuidesCostcoCouponBookRoute: typeof GuidesCostcoCouponBookRoute
+  GuidesLiquidationStoresRoute: typeof GuidesLiquidationStoresRoute
+}
+
+const GuidesRouteChildren: GuidesRouteChildren = {
+  GuidesAmazonBinStoresRoute: GuidesAmazonBinStoresRoute,
+  GuidesAmazonReturnPalletsRoute: GuidesAmazonReturnPalletsRoute,
+  GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
+  GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
+}
+
+const GuidesRouteWithChildren =
+  GuidesRoute._addFileChildren(GuidesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   DealsRoute: DealsRoute,
+  GuidesRoute: GuidesRouteWithChildren,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrustRoute: TrustRoute,
@@ -470,10 +504,6 @@ const rootRouteChildren: RootRouteChildren = {
   CategorySlugRoute: CategorySlugRoute,
   DealSlugRoute: DealSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
-  GuidesAmazonBinStoresRoute: GuidesAmazonBinStoresRoute,
-  GuidesAmazonReturnPalletsRoute: GuidesAmazonReturnPalletsRoute,
-  GuidesCostcoCouponBookRoute: GuidesCostcoCouponBookRoute,
-  GuidesLiquidationStoresRoute: GuidesLiquidationStoresRoute,
   RetailerSlugRoute: RetailerSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
