@@ -24,7 +24,7 @@ const savingGuides = [
     description: "Buy, bid, and flip Amazon returns from B-Stock and Liquidation.com.",
   },
 ];
-import { DealGrid } from "@/components/DealCard";
+import { DealCard, DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
 import { liveCategories, recentDrops, topDeals, topRetailers } from "@/lib/deals-data";
 import { dealsQueryOptions } from "@/lib/deals-query";
@@ -59,6 +59,10 @@ function Index() {
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
   const categories = liveCategories(deals);
+  const amazonDeals = deals
+    .filter((d) => d.retailer === "amazon")
+    .sort((a, b) => b.deal_score - a.deal_score)
+    .slice(0, 3);
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       {/* Hero */}
@@ -112,6 +116,13 @@ function Index() {
         </div>
         <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-[#FF9900]" />
       </Link>
+      {amazonDeals.length > 0 && (
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {amazonDeals.map((deal) => (
+            <DealCard key={deal.id} deal={deal} />
+          ))}
+        </div>
+      )}
 
       {/* Saving Guides */}
       <SectionHeader title="Saving Guides" />
