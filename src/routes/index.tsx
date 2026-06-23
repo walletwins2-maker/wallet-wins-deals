@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowRight, ShoppingBag, Sparkles, TrendingDown } from "lucide-react";
+import { ArrowRight, BookOpen, ShoppingBag, Sparkles, TrendingDown } from "lucide-react";
 
 import { DealCard, DealGrid } from "@/components/DealCard";
 import { Newsletter } from "@/components/Newsletter";
@@ -29,6 +29,28 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const savingGuides = [
+    {
+      to: "/guides/amazon-bin-stores" as const,
+      title: "Amazon Bin Stores",
+      description: "How $7 bin stores work and how to score returns for cheap.",
+    },
+    {
+      to: "/guides/costco-coupon-book" as const,
+      title: "Costco Coupon Book",
+      description: "Maximize savings with this month's Costco coupon book.",
+    },
+    {
+      to: "/guides/liquidation-stores" as const,
+      title: "Liquidation Stores",
+      description: "Find pallets, overstock, and deep discounts near you.",
+    },
+    {
+      to: "/guides/amazon-return-pallets" as const,
+      title: "Amazon Return Pallets",
+      description: "Buy, bid, and flip Amazon returns from B-Stock and Liquidation.com.",
+    },
+  ];
   const { data: deals } = useSuspenseQuery(dealsQueryOptions);
   const featured = topDeals(deals, 8);
   const drops = recentDrops(deals, 8);
@@ -64,12 +86,12 @@ function Index() {
             >
               Browse Deals <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              to="/guides"
+            <a
+              href="#saving-guides"
               className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
             >
               Savings Guides <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
             <a
               href="#recent-price-drops"
               className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-card-hover transition hover:brightness-110"
@@ -148,6 +170,29 @@ function Index() {
         <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} />
       </div>
       <DealGrid deals={drops} />
+
+      {/* Saving Guides */}
+      <div id="saving-guides" className="scroll-mt-24">
+        <SectionHeader title="Saving Guides" icon={<BookOpen className="h-5 w-5 text-primary" />} />
+      </div>
+      <p className="-mt-2 mb-4 text-sm text-muted-foreground">
+        Tips and walkthroughs to save more.
+      </p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {savingGuides.map((g) => (
+          <a
+            key={g.to}
+            href={g.to}
+            className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-hover"
+          >
+            <h3 className="font-display text-lg font-bold">{g.title}</h3>
+            <p className="mt-1 flex-1 text-sm text-muted-foreground">{g.description}</p>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+              Read guide <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+            </span>
+          </a>
+        ))}
+      </div>
 
       <Newsletter />
       <div className="h-10" />
