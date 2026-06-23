@@ -52,8 +52,8 @@ function Index() {
     },
   ];
   const { data: deals } = useSuspenseQuery(dealsQueryOptions);
-  const featured = topDeals(deals, 8);
-  const drops = recentDrops(deals, 8);
+  const featured = topDeals(deals, 9);
+  const drops = recentDrops(deals, 9);
   const retailers = topRetailers(deals, 8);
   const allRetailers = topRetailers(deals, 1000)
     .slice()
@@ -192,7 +192,7 @@ function Index() {
 
       {/* Recent drops */}
       <div id="recent-price-drops" className="scroll-mt-24">
-        <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} />
+        <SectionHeader title="📉 Recent Price Drops" icon={<TrendingDown className="h-5 w-5 text-success" />} link="/deals" linkLabel="See all" />
       </div>
       <DealGrid deals={drops} />
 
