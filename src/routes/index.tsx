@@ -116,6 +116,13 @@ function Index() {
         </div>
         <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-[#FF9900]" />
       </Link>
+      {amazonDeals.length > 0 && (
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {amazonDeals.map((deal) => (
+            <DealCard key={deal.id} deal={deal} />
+          ))}
+        </div>
+      )}
 
       {/* Saving Guides */}
       <SectionHeader title="Saving Guides" />
