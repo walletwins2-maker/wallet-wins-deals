@@ -60,11 +60,13 @@ function Index() {
     .sort((a, b) => a.name.localeCompare(b.name));
   const categories = liveCategories(deals);
   const amazonDeals = (() => {
-    // Sort by biggest discount first so category winners are the deepest cuts.
+    // Sort by best score (then discount) so category winners are truly the best deals.
     const amazon = deals
       .filter((d) => d.retailer === "amazon")
-      .sort((a, b) => b.discount - a.discount);
-    // One deal per category for variety
+      .sort(
+        (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
+      );
+    // One best deal per category for variety
     const seen = new Set<string>();
     const picked: typeof amazon = [];
     for (const d of amazon) {
@@ -74,15 +76,17 @@ function Index() {
       }
       if (picked.length >= 9) break;
     }
-    // Fill remaining slots with the next deepest discounts
+    // Fill remaining slots with the next best deals
     if (picked.length < 9) {
       for (const d of amazon) {
         if (!picked.includes(d)) picked.push(d);
         if (picked.length >= 9) break;
       }
     }
-    // Re-sort final picks by discount so the best savings render first
-    return picked.sort((a, b) => b.discount - a.discount);
+    // Re-sort final picks by score so the best deals render first
+    return picked.sort(
+      (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
+    );
   })();
   // Highlight the top 3 discounts in the Amazon grid
   const amazonTopIds = new Set(amazonDeals.slice(0, 3).map((d) => d.id));
