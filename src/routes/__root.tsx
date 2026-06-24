@@ -146,6 +146,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           ],
         }),
       },
+      {
+        children:
+          "function gtagSendEvent(url) { var callback = function () { if (typeof url === 'string') { window.location = url; } }; gtag('event', 'conversion_event_outbound_click_2', { 'event_callback': callback, 'event_timeout': 2000 }); return false; }",
+      },
     ],
   }),
   shellComponent: RootShell,
