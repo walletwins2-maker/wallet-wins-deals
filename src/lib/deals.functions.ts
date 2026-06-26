@@ -15,45 +15,55 @@ function dbCreds() {
 export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
   async (): Promise<Deal[]> => {
     const { url, key } = dbCreds();
-    const qs = new URLSearchParams({
+    // PostgREST caps a single response at the server's max-rows (1000 here),
+    // so pull every active row by paginating with Range headers until a short
+    // page comes back. Hard cap pages to avoid runaway fetches.
+    const PAGE_SIZE = 1000;
+    const MAX_PAGES = 20; // up to 20k deals
+    const baseQs = new URLSearchParams({
       select:
         "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
       status: "in.(pending,queued)",
       order: "created_at.desc,id.desc",
-      limit: "1000",
     });
-    const endpoint = `${url}/rest/v1/live_deals?${qs.toString()}`;
-    const doFetch = () =>
+    const endpoint = `${url}/rest/v1/live_deals?${baseQs.toString()}`;
+    const fetchRange = (from: number, to: number) =>
       fetch(endpoint, {
         headers: {
           apikey: key,
           Authorization: `Bearer ${key}`,
           Accept: "application/json",
           "Range-Unit": "items",
+          Range: `${from}-${to}`,
           Prefer: "count=none",
         },
       });
-    let res: Response;
-    try {
-      res = await doFetch();
-      // Retry once on transient upstream failure (e.g. statement timeout 57014).
-      if (!res.ok && (res.status >= 500 || res.status === 408)) {
-        const body = await res.text();
-        console.error("[fetchDealsServer] upstream error, retrying", res.status, body.slice(0, 300));
-        res = await doFetch();
+    const rows: RawDeal[] = [];
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      let res: Response;
+      try {
+        res = await fetchRange(from, to);
+        if (!res.ok && (res.status >= 500 || res.status === 408)) {
+          const body = await res.text();
+          console.error("[fetchDealsServer] upstream error, retrying", res.status, body.slice(0, 300));
+          res = await fetchRange(from, to);
+        }
+      } catch (err) {
+        console.error("[fetchDealsServer] network error", err);
+        break;
       }
-    } catch (err) {
-      console.error("[fetchDealsServer] network error", err);
-      return [];
+      if (!res.ok) {
+        const body = await res.text();
+        console.error("[fetchDealsServer] upstream error", res.status, body.slice(0, 500));
+        if (page === 0) return [];
+        break;
+      }
+      const batch = (await res.json()) as RawDeal[];
+      rows.push(...batch);
+      if (batch.length < PAGE_SIZE) break;
     }
-    if (!res.ok) {
-      const body = await res.text();
-      // Log server-side; never leak provider error details to the browser.
-      // Return an empty list so the page still renders instead of 500-ing.
-      console.error("[fetchDealsServer] upstream error", res.status, body.slice(0, 500));
-      return [];
-    }
-    const rows = (await res.json()) as RawDeal[];
     // Ensure Amazon always fills its 30-slot cap. The primary fetch is ordered
     // by created_at desc, so older Amazon rows can fall outside the 1000-row
     // window. Top up with a dedicated Amazon query when short.
