@@ -54,6 +54,7 @@ export function trackAffiliateClick(event: AffiliateClickEvent) {
     link_url: event.productUrl,
     value: event.value,
     currency,
+    send_to: "G-CD4XN6WDDG",
   });
 
   // 2. Google Ads conversion — only when configured.
