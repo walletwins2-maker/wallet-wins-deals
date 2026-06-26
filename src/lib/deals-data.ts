@@ -476,39 +476,82 @@ export function liveCategories(deals: Deal[]): Array<(typeof CATEGORIES)[number]
   }));
 }
 
-export function topDeals(deals: Deal[], limit = 8) {
-  const ranked = [...activeDeals(deals)].sort(
-    (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
-  );
-  // Diversify by retailer: take the best deal per retailer first (round-robin),
-  // then top up with the next-best remaining deals if we still need more.
+// Loose similarity key so we don't show two near-duplicate products in the
+// same grid (e.g. two variants of the same charger).
+function similarityKey(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(" ");
+}
+
+// Pick `limit` deals from `ranked` (already sorted best-first) while spreading
+// across categories and retailers and avoiding near-duplicate product names.
+function diversifiedPick(ranked: Deal[], limit: number): Deal[] {
   const picked: Deal[] = [];
-  const seenRetailers = new Set<string>();
+  const pickedIds = new Set<string>();
+  const seenSimilar = new Set<string>();
+
+  const tryAdd = (d: Deal) => {
+    if (pickedIds.has(d.id)) return false;
+    const sim = similarityKey(d.product_name);
+    if (sim && seenSimilar.has(sim)) return false;
+    picked.push(d);
+    pickedIds.add(d.id);
+    if (sim) seenSimilar.add(sim);
+    return true;
+  };
+
+  // Pass 1: one best deal per category (variety first).
+  const seenCats = new Set<string>();
+  for (const d of ranked) {
+    if (picked.length >= limit) break;
+    if (seenCats.has(d.category)) continue;
+    if (tryAdd(d)) seenCats.add(d.category);
+  }
+  // Pass 2: one more per retailer, still preferring unseen categories.
+  const seenRetailers = new Set(picked.map((d) => d.retailer));
   for (const d of ranked) {
     if (picked.length >= limit) break;
     if (seenRetailers.has(d.retailer)) continue;
-    picked.push(d);
-    seenRetailers.add(d.retailer);
+    if (tryAdd(d)) seenRetailers.add(d.retailer);
   }
+  // Pass 3: top up with next-best remaining, still avoiding similar names.
+  for (const d of ranked) {
+    if (picked.length >= limit) break;
+    tryAdd(d);
+  }
+  // Pass 4: last resort — fill any leftover slots ignoring similarity.
   if (picked.length < limit) {
-    const pickedIds = new Set(picked.map((d) => d.id));
     for (const d of ranked) {
       if (picked.length >= limit) break;
       if (pickedIds.has(d.id)) continue;
       picked.push(d);
+      pickedIds.add(d.id);
     }
   }
   return picked;
 }
 
+export function topDeals(deals: Deal[], limit = 8) {
+  const ranked = [...activeDeals(deals)].sort(
+    (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
+  );
+  return diversifiedPick(ranked, limit);
+}
+
 export function recentDrops(deals: Deal[], limit = 8) {
-  return [...activeDeals(deals)]
+  const ranked = [...activeDeals(deals)]
+    .filter((d) => d.discount > 0)
     .sort(
       (a, b) =>
         b.discount - a.discount ||
         +new Date(b.created_at) - +new Date(a.created_at),
-    )
-    .slice(0, limit);
+    );
+  return diversifiedPick(ranked, limit);
 }
 
 export function relatedDeals(deals: Deal[], deal: Deal, limit = 4) {

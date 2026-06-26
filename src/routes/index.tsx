@@ -60,30 +60,10 @@ function Index() {
     .sort((a, b) => a.name.localeCompare(b.name));
   const categories = liveCategories(deals);
   const amazonDeals = (() => {
-    // Sort by best score (then discount) so category winners are truly the best deals.
-    const amazon = deals
-      .filter((d) => d.retailer === "amazon")
-      .sort(
-        (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
-      );
-    // One best deal per category for variety
-    const seen = new Set<string>();
-    const picked: typeof amazon = [];
-    for (const d of amazon) {
-      if (!seen.has(d.category)) {
-        seen.add(d.category);
-        picked.push(d);
-      }
-      if (picked.length >= 9) break;
-    }
-    // Fill remaining slots with the next best deals
-    if (picked.length < 9) {
-      for (const d of amazon) {
-        if (!picked.includes(d)) picked.push(d);
-        if (picked.length >= 9) break;
-      }
-    }
-    // Re-sort final picks by score so the best deals render first
+    // Sort by best score (then discount) and diversify across categories +
+    // avoid near-duplicate product names so the 9 cards feel distinct.
+    const amazon = deals.filter((d) => d.retailer === "amazon");
+    const picked = topDeals(amazon, 9);
     return picked.sort(
       (a, b) => b.deal_score - a.deal_score || b.discount - a.discount,
     );
