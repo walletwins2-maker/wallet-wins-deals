@@ -109,6 +109,10 @@ function Index() {
         </div>
       </section>
 
+      {/* Featured */}
+      <SectionHeader title="🔥 Featured Deals" link="/deals" linkLabel="See all" />
+      <DealGrid deals={featured} />
+
       {/* Amazon Deals */}
       <Link
         to="/retailer/$slug"
@@ -156,10 +160,6 @@ function Index() {
           </div>
         </>
       )}
-
-      {/* Featured */}
-      <SectionHeader title="🔥 Featured Deals" link="/deals" linkLabel="See all" />
-      <DealGrid deals={featured} />
 
 
       {/* Categories */}
