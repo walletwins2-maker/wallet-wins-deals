@@ -94,10 +94,13 @@ function RetailerPage() {
   const top = [...deals].sort((a, b) => b.discount - a.discount).slice(0, 4);
   const recent = [...deals].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
   const byCategory = CATEGORIES
-    .map((c) => ({ cat: c, items: deals.filter((d) => d.category === c.slug) }))
+    .map((c) => ({ cat: c, items: deals.filter((d: typeof deals[number]) => d.category === c.slug) }))
     .filter((g) => g.items.length > 0)
     .sort((a, b) => b.items.length - a.items.length);
-  const maxDiscount = deals.reduce((m, d) => (d.discount > m ? d.discount : m), 0);
+  const maxDiscount = deals.reduce(
+    (m: number, d: typeof deals[number]) => (d.discount > m ? d.discount : m),
+    0,
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
