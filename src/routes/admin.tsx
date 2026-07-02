@@ -92,7 +92,13 @@ function isoBoundary(input: string, end: boolean): string | null {
 
 function csvEscape(value: unknown): string {
   if (value === null || value === undefined) return "";
-  const s = String(value);
+  let s = String(value);
+  // Prevent CSV formula injection: cells starting with =, +, -, @, tab, or CR
+  // are interpreted as formulas by Excel/Sheets/Numbers. Prefix with a single
+  // quote so the cell is treated as literal text.
+  if (s.length > 0 && /^[=+\-@\t\r]/.test(s)) {
+    s = `'${s}`;
+  }
   if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
