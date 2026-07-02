@@ -377,7 +377,7 @@ function asNumber(v: unknown, fallback = 0): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function asStatus(s: string | null): DealStatus {
+function asStatus(s: string | null | undefined): DealStatus {
   if (s === "pending" || s === "queued" || s === "posted" || s === "expired") return s;
   return "queued";
 }
