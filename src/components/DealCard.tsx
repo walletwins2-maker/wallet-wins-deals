@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import type { Deal } from "@/lib/deals-data";
 import { formatPrice, retailerBySlug } from "@/lib/deals-data";
 
@@ -6,6 +7,8 @@ export function DealCard({ deal }: { deal: Deal }) {
   const retailer = retailerBySlug(deal.retailer);
   const savings = deal.original_price - deal.price;
   const hasDrop = deal.discount > 0 && savings > 0;
+  const [imageFailed, setImageFailed] = useState(false);
+  if (imageFailed) return null;
   return (
     <Link
       to="/deal/$slug"
@@ -18,6 +21,7 @@ export function DealCard({ deal }: { deal: Deal }) {
           alt={deal.product_name}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={() => setImageFailed(true)}
         />
         {hasDrop ? (
           <span className="absolute left-3 top-3 rounded-full bg-deal-badge px-2.5 py-1 text-xs font-bold text-white shadow-sm">
