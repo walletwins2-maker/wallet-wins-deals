@@ -22,7 +22,7 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
     const MAX_PAGES = 20; // up to 20k deals
     const baseQs = new URLSearchParams({
       select:
-        "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,created_at,product_fingerprint",
+        "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,created_at",
       price: "gt.0",
       discount: "gt.0",
       order: "created_at.desc,id.desc",
@@ -76,7 +76,7 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
         const need = 30 - amazonCount;
         const aqs = new URLSearchParams({
           select:
-            "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,created_at,product_fingerprint",
+            "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,created_at",
           price: "gt.0",
           discount: "gt.0",
           retailer: "eq.amazon",

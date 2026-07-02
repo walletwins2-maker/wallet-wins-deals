@@ -24,7 +24,7 @@ export interface RawDeal {
   product_name: string | null;
   image_url: string | null;
   product_url: string | null;
-  product_fingerprint: string | null;
+  product_fingerprint?: string | null;
   price: number | string | null;
   original_price: number | string | null;
   discount: number | string | null;
