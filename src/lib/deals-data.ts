@@ -387,7 +387,7 @@ const PLACEHOLDER_IMG =
 
 export function mapRawDeals(rows: RawDeal[]): Deal[] {
   const mapped = rows
-    .filter((r) => r.product_name && r.product_url)
+    .filter((r) => r.product_name && r.product_url && r.image_url && r.image_url.trim().length > 0)
     .map((r): Deal => {
       const price = asNumber(r.price);
       const original = asNumber(r.original_price, price);
