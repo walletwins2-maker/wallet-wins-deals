@@ -13,6 +13,7 @@ import { Route as UnsubscribedRouteImport } from './routes/unsubscribed'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as RetailersRouteImport } from './routes/retailers'
 import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -50,6 +51,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailersRoute = RetailersRouteImport.update({
+  id: '/retailers',
+  path: '/retailers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidesRoute = GuidesRouteImport.update({
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
   '/guides': typeof GuidesRouteWithChildren
+  '/retailers': typeof RetailersRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
   '/guides': typeof GuidesRouteWithChildren
+  '/retailers': typeof RetailersRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/deals': typeof DealsRoute
   '/guides': typeof GuidesRouteWithChildren
+  '/retailers': typeof RetailersRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trust': typeof TrustRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/deals'
     | '/guides'
+    | '/retailers'
     | '/search'
     | '/sitemap.xml'
     | '/trust'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/deals'
     | '/guides'
+    | '/retailers'
     | '/search'
     | '/sitemap.xml'
     | '/trust'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/deals'
     | '/guides'
+    | '/retailers'
     | '/search'
     | '/sitemap.xml'
     | '/trust'
@@ -300,6 +312,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DealsRoute: typeof DealsRoute
   GuidesRoute: typeof GuidesRouteWithChildren
+  RetailersRoute: typeof RetailersRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrustRoute: typeof TrustRoute
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retailers': {
+      id: '/retailers'
+      path: '/retailers'
+      fullPath: '/retailers'
+      preLoaderRoute: typeof RetailersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guides': {
@@ -497,6 +517,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DealsRoute: DealsRoute,
   GuidesRoute: GuidesRouteWithChildren,
+  RetailersRoute: RetailersRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrustRoute: TrustRoute,
