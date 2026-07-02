@@ -24,13 +24,13 @@ export interface RawDeal {
   product_name: string | null;
   image_url: string | null;
   product_url: string | null;
-  product_fingerprint: string | null;
+  product_fingerprint?: string | null;
   price: number | string | null;
   original_price: number | string | null;
   discount: number | string | null;
   retailer: string | null;
   deal_score: number | string | null;
-  status: string | null;
+  status?: string | null;
   created_at: string | null;
 }
 
@@ -377,7 +377,7 @@ function asNumber(v: unknown, fallback = 0): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function asStatus(s: string | null): DealStatus {
+function asStatus(s: string | null | undefined): DealStatus {
   if (s === "pending" || s === "queued" || s === "posted" || s === "expired") return s;
   return "queued";
 }

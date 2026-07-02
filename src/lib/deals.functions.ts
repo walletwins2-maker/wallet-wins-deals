@@ -22,8 +22,9 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
     const MAX_PAGES = 20; // up to 20k deals
     const baseQs = new URLSearchParams({
       select:
-        "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
-      status: "in.(pending,queued)",
+        "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,created_at",
+      price: "gt.0",
+      discount: "gt.0",
       order: "created_at.desc,id.desc",
     });
     const endpoint = `${url}/rest/v1/live_deals?${baseQs.toString()}`;
@@ -75,8 +76,9 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
         const need = 30 - amazonCount;
         const aqs = new URLSearchParams({
           select:
-            "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,status,created_at,product_fingerprint",
-          status: "in.(pending,queued)",
+            "id,slug,product_name,product_url,image_url,price,original_price,discount,retailer,deal_score,created_at",
+          price: "gt.0",
+          discount: "gt.0",
           retailer: "eq.amazon",
           order: "deal_score.desc.nullslast,created_at.desc,id.desc",
           limit: String(Math.max(need * 3, 60)),
