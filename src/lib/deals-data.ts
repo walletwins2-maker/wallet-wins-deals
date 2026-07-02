@@ -30,7 +30,7 @@ export interface RawDeal {
   discount: number | string | null;
   retailer: string | null;
   deal_score: number | string | null;
-  status: string | null;
+  status?: string | null;
   created_at: string | null;
 }
 
