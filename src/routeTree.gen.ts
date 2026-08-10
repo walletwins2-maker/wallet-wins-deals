@@ -9,63 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnsubscribedRouteImport } from './routes/unsubscribed'
-import { Route as TrustRouteImport } from './routes/trust'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as RetailersRouteImport } from './routes/retailers'
-import { Route as GuidesRouteImport } from './routes/guides'
-import { Route as DealsRouteImport } from './routes/deals'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
-import { Route as GuidesLiquidationStoresRouteImport } from './routes/guides.liquidation-stores'
-import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
-import { Route as GuidesAmazonReturnPalletsRouteImport } from './routes/guides.amazon-return-pallets'
-import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazon-bin-stores'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as DealSlugRouteImport } from './routes/deal.$slug'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as DealsRouteImport } from './routes/deals'
+import { Route as GuidesRouteImport } from './routes/guides'
+import { Route as RetailersRouteImport } from './routes/retailers'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TrustRouteImport } from './routes/trust'
+import { Route as UnsubscribedRouteImport } from './routes/unsubscribed'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as DealSlugRouteImport } from './routes/deal.$slug'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as GuidesAmazonBinStoresRouteImport } from './routes/guides.amazon-bin-stores'
+import { Route as GuidesAmazonReturnPalletsRouteImport } from './routes/guides.amazon-return-pallets'
+import { Route as GuidesCostcoCouponBookRouteImport } from './routes/guides.costco-coupon-book'
+import { Route as GuidesLiquidationStoresRouteImport } from './routes/guides.liquidation-stores'
+import { Route as RetailerSlugRouteImport } from './routes/retailer.$slug'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 
-const UnsubscribedRoute = UnsubscribedRouteImport.update({
-  id: '/unsubscribed',
-  path: '/unsubscribed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrustRoute = TrustRouteImport.update({
-  id: '/trust',
-  path: '/trust',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RetailersRoute = RetailersRouteImport.update({
-  id: '/retailers',
-  path: '/retailers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GuidesRoute = GuidesRouteImport.update({
-  id: '/guides',
-  path: '/guides',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsRoute = DealsRouteImport.update({
-  id: '/deals',
-  path: '/deals',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -73,24 +43,59 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DealsRoute = DealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RetailerSlugRoute = RetailerSlugRouteImport.update({
-  id: '/retailer/$slug',
-  path: '/retailer/$slug',
+const GuidesRoute = GuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuidesLiquidationStoresRoute = GuidesLiquidationStoresRouteImport.update({
-  id: '/liquidation-stores',
-  path: '/liquidation-stores',
-  getParentRoute: () => GuidesRoute,
+const RetailersRoute = RetailersRouteImport.update({
+  id: '/retailers',
+  path: '/retailers',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
-  id: '/costco-coupon-book',
-  path: '/costco-coupon-book',
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustRoute = TrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribedRoute = UnsubscribedRouteImport.update({
+  id: '/unsubscribed',
+  path: '/unsubscribed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealSlugRoute = DealSlugRouteImport.update({
+  id: '/deal/$slug',
+  path: '/deal/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesAmazonBinStoresRoute = GuidesAmazonBinStoresRouteImport.update({
+  id: '/amazon-bin-stores',
+  path: '/amazon-bin-stores',
   getParentRoute: () => GuidesRoute,
 } as any)
 const GuidesAmazonReturnPalletsRoute =
@@ -99,24 +104,19 @@ const GuidesAmazonReturnPalletsRoute =
     path: '/amazon-return-pallets',
     getParentRoute: () => GuidesRoute,
   } as any)
-const GuidesAmazonBinStoresRoute = GuidesAmazonBinStoresRouteImport.update({
-  id: '/amazon-bin-stores',
-  path: '/amazon-bin-stores',
+const GuidesCostcoCouponBookRoute = GuidesCostcoCouponBookRouteImport.update({
+  id: '/costco-coupon-book',
+  path: '/costco-coupon-book',
   getParentRoute: () => GuidesRoute,
 } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
+const GuidesLiquidationStoresRoute = GuidesLiquidationStoresRouteImport.update({
+  id: '/liquidation-stores',
+  path: '/liquidation-stores',
+  getParentRoute: () => GuidesRoute,
 } as any)
-const DealSlugRoute = DealSlugRouteImport.update({
-  id: '/deal/$slug',
-  path: '/deal/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategorySlugRoute = CategorySlugRouteImport.update({
-  id: '/category/$slug',
-  path: '/category/$slug',
+const RetailerSlugRoute = RetailerSlugRouteImport.update({
+  id: '/retailer/$slug',
+  path: '/retailer/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
@@ -124,10 +124,20 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailTransactionalPreviewRoute =
@@ -136,22 +146,12 @@ const LovableEmailTransactionalPreviewRoute =
     path: '/lovable/email/transactional/preview',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -331,53 +331,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/unsubscribed': {
-      id: '/unsubscribed'
-      path: '/unsubscribed'
-      fullPath: '/unsubscribed'
-      preLoaderRoute: typeof UnsubscribedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trust': {
-      id: '/trust'
-      path: '/trust'
-      fullPath: '/trust'
-      preLoaderRoute: typeof TrustRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/retailers': {
-      id: '/retailers'
-      path: '/retailers'
-      fullPath: '/retailers'
-      preLoaderRoute: typeof RetailersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/guides': {
-      id: '/guides'
-      path: '/guides'
-      fullPath: '/guides'
-      preLoaderRoute: typeof GuidesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals': {
-      id: '/deals'
-      path: '/deals'
-      fullPath: '/deals'
-      preLoaderRoute: typeof DealsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -387,60 +345,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/deals': {
+      id: '/deals'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof DealsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/retailer/$slug': {
-      id: '/retailer/$slug'
-      path: '/retailer/$slug'
-      fullPath: '/retailer/$slug'
-      preLoaderRoute: typeof RetailerSlugRouteImport
+    '/guides': {
+      id: '/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof GuidesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/guides/liquidation-stores': {
-      id: '/guides/liquidation-stores'
-      path: '/liquidation-stores'
-      fullPath: '/guides/liquidation-stores'
-      preLoaderRoute: typeof GuidesLiquidationStoresRouteImport
-      parentRoute: typeof GuidesRoute
-    }
-    '/guides/costco-coupon-book': {
-      id: '/guides/costco-coupon-book'
-      path: '/costco-coupon-book'
-      fullPath: '/guides/costco-coupon-book'
-      preLoaderRoute: typeof GuidesCostcoCouponBookRouteImport
-      parentRoute: typeof GuidesRoute
-    }
-    '/guides/amazon-return-pallets': {
-      id: '/guides/amazon-return-pallets'
-      path: '/amazon-return-pallets'
-      fullPath: '/guides/amazon-return-pallets'
-      preLoaderRoute: typeof GuidesAmazonReturnPalletsRouteImport
-      parentRoute: typeof GuidesRoute
-    }
-    '/guides/amazon-bin-stores': {
-      id: '/guides/amazon-bin-stores'
-      path: '/amazon-bin-stores'
-      fullPath: '/guides/amazon-bin-stores'
-      preLoaderRoute: typeof GuidesAmazonBinStoresRouteImport
-      parentRoute: typeof GuidesRoute
-    }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+    '/retailers': {
+      id: '/retailers'
+      path: '/retailers'
+      fullPath: '/retailers'
+      preLoaderRoute: typeof RetailersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/deal/$slug': {
-      id: '/deal/$slug'
-      path: '/deal/$slug'
-      fullPath: '/deal/$slug'
-      preLoaderRoute: typeof DealSlugRouteImport
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust': {
+      id: '/trust'
+      path: '/trust'
+      fullPath: '/trust'
+      preLoaderRoute: typeof TrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribed': {
+      id: '/unsubscribed'
+      path: '/unsubscribed'
+      fullPath: '/unsubscribed'
+      preLoaderRoute: typeof UnsubscribedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -450,6 +401,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deal/$slug': {
+      id: '/deal/$slug'
+      path: '/deal/$slug'
+      fullPath: '/deal/$slug'
+      preLoaderRoute: typeof DealSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/amazon-bin-stores': {
+      id: '/guides/amazon-bin-stores'
+      path: '/amazon-bin-stores'
+      fullPath: '/guides/amazon-bin-stores'
+      preLoaderRoute: typeof GuidesAmazonBinStoresRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/amazon-return-pallets': {
+      id: '/guides/amazon-return-pallets'
+      path: '/amazon-return-pallets'
+      fullPath: '/guides/amazon-return-pallets'
+      preLoaderRoute: typeof GuidesAmazonReturnPalletsRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/costco-coupon-book': {
+      id: '/guides/costco-coupon-book'
+      path: '/costco-coupon-book'
+      fullPath: '/guides/costco-coupon-book'
+      preLoaderRoute: typeof GuidesCostcoCouponBookRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/liquidation-stores': {
+      id: '/guides/liquidation-stores'
+      path: '/liquidation-stores'
+      fullPath: '/guides/liquidation-stores'
+      preLoaderRoute: typeof GuidesLiquidationStoresRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/retailer/$slug': {
+      id: '/retailer/$slug'
+      path: '/retailer/$slug'
+      fullPath: '/retailer/$slug'
+      preLoaderRoute: typeof RetailerSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -457,25 +457,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/webhook': {
@@ -485,11 +471,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -536,3 +536,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
