@@ -63,8 +63,8 @@ const logoutAdmin = createServerFn({ method: "POST" }).handler(async () => {
 });
 
 // Admin-gated server action that re-fetches deals from the upstream DB,
-// bypassing the React Query cache. Returns the fresh count so the UI can
-// confirm. Verifies the HttpOnly admin cookie; no upstream writes.
+// bypassing the React Query cache, and records the check time for each deal
+// in the local `deal_checks` table. Verifies the HttpOnly admin cookie.
 const refreshDealsAdmin = createServerFn({ method: "POST" }).handler(async () => {
   const expected = process.env.ADMIN_DASHBOARD_TOKEN;
   const cookie = getCookie(ADMIN_COOKIE);
@@ -73,7 +73,26 @@ const refreshDealsAdmin = createServerFn({ method: "POST" }).handler(async () =>
   }
   try {
     const deals = await fetchDealsServer();
-    return { ok: true as const, count: deals.length, refreshedAt: new Date().toISOString() };
+    const checkedAt = new Date().toISOString();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Upsert last-checked timestamps in chunks to keep each request small.
+    const chunkSize = 1000;
+    const upsertRows = deals.map((d) => ({
+      deal_id: d.id,
+      product_url: d.product_url ?? null,
+      last_checked_at: checkedAt,
+    }));
+    for (let i = 0; i < upsertRows.length; i += chunkSize) {
+      const chunk = upsertRows.slice(i, i + chunkSize);
+      const { error } = await supabaseAdmin
+        .from("deal_checks")
+        .upsert(chunk, { onConflict: "deal_id" });
+      if (error) {
+        console.error("[refreshDealsAdmin] deal_checks upsert chunk failed", error);
+        // Don't fail the whole refresh; still return the deals count.
+      }
+    }
+    return { ok: true as const, count: deals.length, refreshedAt: checkedAt };
   } catch (err) {
     console.error("[refreshDealsAdmin] fetch failed", err);
     return { ok: false as const, error: "Refresh failed. Please try again." };
