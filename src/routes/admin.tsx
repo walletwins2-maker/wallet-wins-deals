@@ -332,12 +332,13 @@ function AdminDashboard() {
               setRefreshMsg(null);
               try {
                 const res = await refreshDeals();
-                if (!res.ok) {
+              if (!res.ok) {
                   setRefreshMsg(res.error);
                 } else {
                   await queryClient.invalidateQueries({ queryKey: dealsQueryOptions.queryKey });
                   await queryClient.refetchQueries({ queryKey: dealsQueryOptions.queryKey });
-                  setRefreshMsg(`Refreshed ${res.count} deals.`);
+                  const when = new Date(res.refreshedAt).toLocaleString();
+                  setRefreshMsg(`Refreshed ${res.count} deals. Last checked: ${when}.`);
                 }
               } catch {
                 setRefreshMsg("Refresh failed.");
