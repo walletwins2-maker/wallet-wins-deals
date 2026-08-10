@@ -332,7 +332,6 @@ function AdminDashboard() {
               setRefreshMsg(null);
               try {
                 const res = await refreshDeals();
-                const res = await refreshDeals();
                 if (!res.ok) {
                   setRefreshMsg(res.error);
                 } else {
