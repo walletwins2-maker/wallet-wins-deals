@@ -67,7 +67,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Wallet Wins. Prices and discounts shown are for demonstration.
+        © {new Date().getFullYear()} Wallet Wins. Prices, availability, and discounts may change. Check the retailer's site for the latest price and terms.
       </div>
     </footer>
   );
