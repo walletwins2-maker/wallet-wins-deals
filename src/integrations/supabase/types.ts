@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      deal_checks: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          last_checked_at: string
+          product_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          last_checked_at?: string
+          product_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          last_checked_at?: string
+          product_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
