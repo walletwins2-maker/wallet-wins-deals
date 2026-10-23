@@ -65,9 +65,10 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
       rows.push(...batch);
       if (batch.length < PAGE_SIZE) break;
     }
-    // Ensure Amazon always fills its 30-slot cap. The primary fetch is ordered
-    // by created_at desc, so older Amazon rows can fall outside the 1000-row
-    // window. Top up with a dedicated Amazon query when short.
+    // Guarantee a minimum Amazon presence (a floor, not a cap — Amazon is
+    // uncapped in diversifyByRetailer). The primary fetch is ordered by
+    // created_at desc, so older Amazon rows can fall outside the window.
+    // Top up with a dedicated Amazon query when short.
     const amazonCount = rows.filter(
       (r) => (r.retailer ?? "").toLowerCase() === "amazon",
     ).length;
@@ -106,17 +107,23 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
         console.error("[fetchDealsServer] amazon top-up failed", err);
       }
     }
-    return diversifyByRetailer(mapRawDeals(rows), 30);
+    // Amazon is uncapped: show every active Amazon deal. Other retailers keep
+    // a 30-deal cap so no single store dominates the feed.
+    return diversifyByRetailer(mapRawDeals(rows), (retailer) =>
+      retailer === "amazon" ? Number.POSITIVE_INFINITY : 30,
+    );
   },
 );
 
-// Reorders deals to maximize retailer AND category variety on the first
-// screens while preserving every deal. For each retailer, the top
-// `maxPerRetailer` are chosen by round-robining across categories (so a
-// retailer's slot isn't dominated by one category), then retailers are
-// round-robined against each other. Overflow is appended at the end so no
-// deals are lost.
-function diversifyByRetailer(deals: Deal[], maxPerRetailer: number): Deal[] {
+// Reorders deals to maximize retailer AND category variety while preserving
+// every deal. For each retailer, the top `capFor(retailer)` deals are chosen
+// by round-robining across categories (so a retailer's slot isn't dominated
+// by one category), then retailers are round-robined against each other.
+// Overflow is appended at the end so no deals are lost.
+function diversifyByRetailer(
+  deals: Deal[],
+  capFor: (retailer: string) => number,
+): Deal[] {
   const scoreOf = (d: Deal) =>
     typeof (d as { deal_score?: number }).deal_score === "number"
       ? (d as { deal_score: number }).deal_score
@@ -130,7 +137,8 @@ function diversifyByRetailer(deals: Deal[], maxPerRetailer: number): Deal[] {
   }
   const capped: Deal[][] = [];
   const overflow: Deal[] = [];
-  for (const list of groups.values()) {
+  for (const [key, list] of groups.entries()) {
+    const cap = capFor(key);
     // Within a retailer, group by category and round-robin across categories
     // so the top-N for that retailer spans as many categories as possible.
     const byCat = new Map<string, Deal[]>();
@@ -146,10 +154,10 @@ function diversifyByRetailer(deals: Deal[], maxPerRetailer: number): Deal[] {
     const picked: Deal[] = [];
     let i = 0;
     let added = true;
-    while (added && picked.length < maxPerRetailer) {
+    while (added && picked.length < cap) {
       added = false;
       for (const q of catQueues) {
-        if (picked.length >= maxPerRetailer) break;
+        if (picked.length >= cap) break;
         if (q[i]) {
           picked.push(q[i]);
           added = true;
