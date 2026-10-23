@@ -7,7 +7,7 @@ import type { Deal } from "./deals-data";
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 export const dealsQueryOptions = queryOptions<Deal[]>({
-  queryKey: ["deals", "all", "manual-refresh-2026-07-02b"],
+  queryKey: ["deals", "all", "manual-refresh-2026-10-23"],
   queryFn: () => fetchDealsServer(),
   staleTime: ONE_DAY,
   gcTime: ONE_DAY * 2,

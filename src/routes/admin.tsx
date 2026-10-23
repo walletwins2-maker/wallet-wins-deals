@@ -205,7 +205,7 @@ export const Route = createFileRoute("/admin")({
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Couldn't load dashboard</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Something went wrong."}</p>
     </div>
   ),
 });
@@ -441,7 +441,7 @@ function AdminDashboard() {
           {[...deals].sort((a, b) => b.deal_score - a.deal_score).slice(0, 8).map((d) => (
             <li key={d.id} className="flex items-center gap-3 py-2">
               <img src={d.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
-              <Link to="/deal/$id" params={{ id: d.id }} className="flex-1 truncate font-semibold hover:text-primary">
+              <Link to="/deal/$slug" params={{ slug: d.slug }} className="flex-1 truncate font-semibold hover:text-primary">
                 {d.product_name}
               </Link>
               <span className="text-xs text-muted-foreground">{categoryBySlug(d.category)?.name}</span>
