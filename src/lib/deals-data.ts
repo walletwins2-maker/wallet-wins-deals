@@ -444,9 +444,21 @@ export function mapRawDeals(rows: RawDeal[]): Deal[] {
 
 /* ---------- helpers operating on a deals array ---------- */
 
-export const activeDeals = (deals: Deal[]) =>
-  deals.filter((d) => d.status !== "expired" && d.price > 0 &&
+export function isAmazonSlipcover(deal: Deal): boolean {
+  return deal.retailer === "amazon" &&
+    /\bslip\s*[-]?\s*covers?\b|\b(?:sofa|couch|chair|recliner|loveseat|furniture|sectional|ottoman|armchair)\s+(?:stretch\s+)?covers?\b/i.test(deal.product_name);
+}
+
+export function activeDeals(deals: Deal[]): Deal[] {
+  const eligible = deals.filter((d) => d.status !== "expired" && d.price > 0 &&
     (d.retailer === "amazon" ? d.discount >= 20 : d.discount > 0));
+  const slipcovers = eligible.filter(isAmazonSlipcover).sort((a, b) =>
+    b.discount - a.discount || b.deal_score - a.deal_score ||
+    String(b.created_at).localeCompare(String(a.created_at)) || a.id.localeCompare(b.id),
+  );
+  const allowed = new Set(slipcovers.slice(0, 3).map((d) => d.id));
+  return eligible.filter((d) => !isAmazonSlipcover(d) || allowed.has(d.id));
+}
 
 export function dealById(deals: Deal[], id: string) {
   return deals.find((d) => d.id === id);

@@ -54,4 +54,16 @@ describe("Amazon source", () => {
     const deals = activeDeals(mapRawDeals(await readDealSources("https://example.com", "test-key", request)));
     expect(deals.map(d => d.id)).toEqual(["3", "2"]);
   });
+  test("retains only the three best Amazon slipcovers without capping other Amazon products", () => {
+    const rows = [
+      ...Array.from({ length: 5 }, (_, i) => ({ ...row(i, "amazon"), product_name: `Stretch Sofa Slipcover ${i}`, discount: 20 + i })),
+      { ...row(10, "amazon"), product_name: "Recliner Cover", discount: 40 },
+      ...Array.from({ length: 40 }, (_, i) => ({ ...row(100 + i, "amazon"), product_name: `Headphones ${i}` })),
+      { ...row(200, "walmart"), product_name: "Sofa Slipcover" },
+    ];
+    const deals = activeDeals(mapRawDeals(rows));
+    expect(deals.filter(d => d.retailer === "amazon" && /cover/i.test(d.product_name)).map(d => d.id)).toEqual(["3", "4", "10"]);
+    expect(deals.filter(d => /Headphones/.test(d.product_name)).length).toBe(40);
+    expect(deals.some(d => d.id === "200")).toBe(true);
+  });
 });

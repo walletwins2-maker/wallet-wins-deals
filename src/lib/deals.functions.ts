@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { mapRawDeals, type Deal, type RawDeal } from "./deals-data";
+import { activeDeals, mapRawDeals, type Deal } from "./deals-data";
 
 function dbCreds() {
   const url = process.env.WALLETWINS_DB_URL;
@@ -19,7 +19,7 @@ export const fetchDealsServer = createServerFn({ method: "GET" }).handler(
     const rows = await readDealSources(url, key);
     // Amazon is uncapped: show every active Amazon deal. Other retailers keep
     // a 30-deal cap so no single store dominates the feed.
-    return diversifyByRetailer(mapRawDeals(rows), (retailer) =>
+    return diversifyByRetailer(activeDeals(mapRawDeals(rows)), (retailer) =>
       retailer === "amazon" ? Number.POSITIVE_INFINITY : 30,
     );
   },
