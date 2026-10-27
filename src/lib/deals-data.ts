@@ -450,8 +450,27 @@ export function isAmazonSlipcover(deal: Deal): boolean {
 }
 
 export function activeDeals(deals: Deal[]): Deal[] {
-  const eligible = deals.filter((d) => d.status !== "expired" && d.price > 0 &&
+  const qualifying = deals.filter((d) => d.status !== "expired" && d.price > 0 &&
     (d.retailer === "amazon" ? d.discount >= 20 : d.discount > 0));
+  const rankedAmazon = qualifying.filter((d) => d.retailer === "amazon").sort((a, b) =>
+    b.discount - a.discount || b.deal_score - a.deal_score ||
+    String(b.created_at).localeCompare(String(a.created_at)) || a.id.localeCompare(b.id),
+  );
+  const seen = new Set<string>();
+  const uniqueAmazon = new Set<string>();
+  for (const deal of rankedAmazon) {
+    const nameKey = deal.product_name.toLowerCase().normalize("NFKC")
+      .replace(/\b(?:black|white|blue|red|green|gray|grey|beige|navy|pink|brown|purple)\b/g, "")
+      .replace(/\b(?:size\s*[:=-]?\s*)?(?:xxs|xs|s|m|l|xl|xxl|2xl|3xl|small|medium|large)\b/g, "")
+      .replace(/[^a-z0-9]+/g, " ").trim();
+    const asin = deal.product_url.match(/\/(?:dp|gp\/product)\/([a-z0-9]{10})(?:[/?]|$)/i)?.[1]?.toUpperCase();
+    const keys = [`name:${nameKey || deal.id}`];
+    if (asin) keys.push(`asin:${asin}`);
+    if (keys.some((key) => seen.has(key))) continue;
+    keys.forEach((key) => seen.add(key));
+    uniqueAmazon.add(deal.id);
+  }
+  const eligible = qualifying.filter((d) => d.retailer !== "amazon" || uniqueAmazon.has(d.id));
   const slipcovers = eligible.filter(isAmazonSlipcover).sort((a, b) =>
     b.discount - a.discount || b.deal_score - a.deal_score ||
     String(b.created_at).localeCompare(String(a.created_at)) || a.id.localeCompare(b.id),

@@ -56,7 +56,7 @@ describe("Amazon source", () => {
   });
   test("retains only the three best Amazon slipcovers without capping other Amazon products", () => {
     const rows = [
-      ...Array.from({ length: 5 }, (_, i) => ({ ...row(i, "amazon"), product_name: `Stretch Sofa Slipcover ${i}`, discount: 20 + i })),
+      ...Array.from({ length: 5 }, (_, i) => ({ ...row(i, "amazon"), product_name: `Stretch Sofa Slipcover ${i}`, discount: 20 + i, original_price: 10 })),
       { ...row(10, "amazon"), product_name: "Recliner Cover", discount: 40 },
       ...Array.from({ length: 40 }, (_, i) => ({ ...row(100 + i, "amazon"), product_name: `Headphones ${i}` })),
       { ...row(200, "walmart"), product_name: "Sofa Slipcover" },
@@ -65,5 +65,16 @@ describe("Amazon source", () => {
     expect(deals.filter(d => d.retailer === "amazon" && /cover/i.test(d.product_name)).map(d => d.id)).toEqual(["3", "4", "10"]);
     expect(deals.filter(d => /Headphones/.test(d.product_name)).length).toBe(40);
     expect(deals.some(d => d.id === "200")).toBe(true);
+  });
+  test("keeps one Amazon listing per same product or color variant and recognizes duplicate Amazon product links", () => {
+    const rows = [
+      { ...row(1, "amazon"), product_name: "Acme Travel Pillow Blue", discount: 20, original_price: 10 },
+      { ...row(2, "amazon"), product_name: "Acme Travel Pillow Red", discount: 30, original_price: 10 },
+      { ...row(3, "amazon"), product_name: "Acme Travel Pillow Red", discount: 25, original_price: 10 },
+      { ...row(4, "amazon"), product_name: "Different Headphones", product_url: "https://amazon.com/dp/B012345678?tag=one" },
+      { ...row(5, "amazon"), product_name: "Alternate Headphone Title", product_url: "https://amazon.com/gp/product/B012345678?tag=two" },
+      { ...row(6, "amazon"), product_name: "Acme Travel Pillow Pro" },
+    ];
+    expect(activeDeals(mapRawDeals(rows)).map(d => d.id)).toEqual(["2", "4", "6"]);
   });
 });
