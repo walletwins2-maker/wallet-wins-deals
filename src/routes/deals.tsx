@@ -28,6 +28,8 @@ export const Route = createFileRoute("/deals")({
   loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "All Deals — Wallet Wins" },
       { name: "description", content: "Browse every active deal. Filter by retailer, category, price, and discount." },
       { property: "og:title", content: "All Deals — Wallet Wins" },

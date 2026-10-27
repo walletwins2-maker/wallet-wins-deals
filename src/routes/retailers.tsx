@@ -11,6 +11,8 @@ export const Route = createFileRoute("/retailers")({
   loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Browse All Retailers — Wallet Wins" },
       { name: "description", content: "Discover deals from hundreds of trusted retailers. Browse by store and find the best discounts, price drops, and coupons updated daily." },
       { property: "og:title", content: "Browse All Retailers — Wallet Wins" },

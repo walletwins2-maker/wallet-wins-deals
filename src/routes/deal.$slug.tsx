@@ -23,7 +23,14 @@ export const Route = createFileRoute("/deal/$slug")({
   },
   head: ({ loaderData }) => {
     const deal = loaderData?.deal;
-    if (!deal) return { meta: [{ title: "Deal — Wallet Wins" }] };
+    if (!deal) return { meta: [
+      { title: "Deal Not Found — Wallet Wins" },
+      { name: "description", content: "This Wallet Wins deal is unavailable. Browse current discounts and price drops." },
+      { property: "og:title", content: "Deal Not Found — Wallet Wins" },
+      { property: "og:description", content: "This Wallet Wins deal is unavailable. Browse current discounts and price drops." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] };
     const suffix = ` — ${deal.discount}% off | Wallet Wins`;
     const maxName = Math.max(20, 60 - suffix.length);
     const shortName =

@@ -5,6 +5,8 @@ export const Route = createFileRoute("/unsubscribed")({
   component: UnsubscribePage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Unsubscribe — Wallet Wins" },
       {
         name: "description",

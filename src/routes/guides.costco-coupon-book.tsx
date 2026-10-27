@@ -14,6 +14,7 @@ export const Route = createFileRoute("/guides/costco-coupon-book")({
   loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
+      { name: "twitter:card", content: "summary_large_image" },
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },
