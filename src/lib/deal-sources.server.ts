@@ -15,7 +15,7 @@ export async function readDealSources(
       select: amazon ? `${PUBLIC_FIELDS},product_fingerprint,status` : PUBLIC_FIELDS,
       retailer: amazon ? "ilike.amazon" : "not.ilike.amazon",
       price: "gt.0",
-      discount: "gt.0",
+      discount: amazon ? "gte.20" : "gt.0",
       order: "created_at.desc,id.desc",
       ...(amazon ? { status: "neq.expired" } : {}),
     });

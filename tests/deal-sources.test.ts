@@ -37,7 +37,7 @@ describe("Amazon source", () => {
     const request: typeof fetch = async (input) => {
       const url = new URL(String(input));
       expect(url.searchParams.get("price")).toBe("gt.0");
-      expect(url.searchParams.get("discount")).toBe("gt.0");
+      expect(url.searchParams.get("discount")).toBe(url.pathname.endsWith("/deals_to_post") ? "gte.20" : "gt.0");
       if (!url.pathname.endsWith("/deals_to_post")) return Response.json([]);
       expect(url.searchParams.get("status")).toBe("neq.expired");
       return Response.json([row(1, "amazon"), { ...row(2, "amazon"), price: 0 },
@@ -45,5 +45,13 @@ describe("Amazon source", () => {
     };
     const deals = activeDeals(mapRawDeals(await readDealSources("https://example.com", "test-key", request)));
     expect(deals.map(d => d.id)).toEqual(["1"]);
+  });
+  test("Amazon includes exactly 20% off but excludes 19%, while other retailers allow lower discounts", async () => {
+    const request: typeof fetch = async (input) => Response.json(String(input).includes("/deals_to_post?")
+      ? [{ ...row(1, "amazon"), discount: 19, original_price: 10 },
+         { ...row(2, "amazon"), discount: 20, original_price: 10 }]
+      : [{ ...row(3, "walmart"), discount: 1, original_price: 10 }]);
+    const deals = activeDeals(mapRawDeals(await readDealSources("https://example.com", "test-key", request)));
+    expect(deals.map(d => d.id)).toEqual(["3", "2"]);
   });
 });

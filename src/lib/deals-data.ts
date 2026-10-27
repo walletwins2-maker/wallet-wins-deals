@@ -445,7 +445,8 @@ export function mapRawDeals(rows: RawDeal[]): Deal[] {
 /* ---------- helpers operating on a deals array ---------- */
 
 export const activeDeals = (deals: Deal[]) =>
-  deals.filter((d) => d.status !== "expired" && d.discount > 0 && d.price > 0);
+  deals.filter((d) => d.status !== "expired" && d.price > 0 &&
+    (d.retailer === "amazon" ? d.discount >= 20 : d.discount > 0));
 
 export function dealById(deals: Deal[], id: string) {
   return deals.find((d) => d.id === id);
