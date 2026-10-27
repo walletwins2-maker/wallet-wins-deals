@@ -12,6 +12,10 @@ export const Route = createFileRoute("/search")({
   loader: ({ context }) => context.queryClient.ensureQueryData(dealsQueryOptions),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Search Deals — Wallet Wins" },
+      { property: "og:description", content: "Search active deals, discounts, and price drops across hundreds of retailers on Wallet Wins." },
       { title: "Search Deals — Wallet Wins" },
       { name: "description", content: "Search active deals, discounts, and price drops across hundreds of retailers on Wallet Wins." },
       { name: "robots", content: "noindex" },

@@ -71,6 +71,7 @@ const FAQS: Array<{ q: string; a: string }> = [
 export const Route = createFileRoute("/guides/amazon-return-pallets")({
   head: () => ({
     meta: [
+      { name: "twitter:card", content: "summary_large_image" },
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },

@@ -18,6 +18,8 @@ export const Route = createFileRoute("/category/$slug")({
     const deals = loaderData?.deals ?? [];
     return {
       meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
         { title: `${name} Deals — Wallet Wins` },
         { name: "description", content: `Save on ${name}. Browse the best ${name} deals and price drops.` },
         { property: "og:title", content: `${name} Deals — Wallet Wins` },

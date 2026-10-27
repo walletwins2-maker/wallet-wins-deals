@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { readDealSources } from "./deal-sources.server";
-import { activeDeals, mapRawDeals, type RawDeal } from "./deals-data";
+import { readDealSources } from "../src/lib/deal-sources.server";
+import { activeDeals, mapRawDeals, type RawDeal } from "../src/lib/deals-data";
 
 const row = (id: number, retailer: string): RawDeal => ({
   id, retailer, product_name: `Product ${id}`, product_url: `https://example.com/product/${id}`,

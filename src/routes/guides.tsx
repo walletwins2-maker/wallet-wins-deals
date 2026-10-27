@@ -27,6 +27,8 @@ const savingGuides = [
 export const Route = createFileRoute("/guides")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Saving Guides — Wallet Wins" },
       { name: "description", content: "Tips and walkthroughs to save more on everyday purchases, from Amazon bin stores to Costco coupon books." },
       { property: "og:title", content: "Saving Guides — Wallet Wins" },
